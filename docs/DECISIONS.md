@@ -3,6 +3,16 @@
 Decisions made during implementation that refine or deviate from [`PLAN.md`](PLAN.md).
 Newest first.
 
+## 2026-10-18 — M3: Lesson completion is a checkbox; export is a `data:` link
+
+- **Context:** The plan says "Mark complete".
+- **Decision:** A labelled checkbox ("I've completed this lesson") instead of a button. Export is
+  an `<a download>` with a `data:` URL instead of building a `Blob` in a click handler.
+- **Why:** A checkbox is a native on/off control, so it can be unticked and screen readers
+  announce its state. The `data:` link needs no JavaScript and is easy to test (jsdom has no
+  `URL.createObjectURL`).
+- **Revisit:** If exported files get large (many submissions in M4+), switch to a `Blob` URL.
+
 ## 2026-10-18 — M2: Vitest runs in threads, at most half the CPU cores
 
 - **Context:** With the defaults, `npm test` crashed with "Fatal process out of memory" on this
