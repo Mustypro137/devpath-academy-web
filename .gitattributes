@@ -1,0 +1,3 @@
+# Store text files with LF line endings in Git, on every OS.
+# Prevents Windows (CRLF) vs Mac/Linux (LF) differences showing up as fake changes.
+* text=auto eol=lf
