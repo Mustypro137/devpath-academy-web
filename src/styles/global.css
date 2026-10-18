@@ -1,0 +1,53 @@
+/* Global styles: a small reset plus base element styles. Component styles live in CSS Modules. */
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: var(--text-xl);
+}
+
+a {
+  color: var(--color-accent);
+}
+
+code {
+  font-family: var(--font-mono);
+}
+
+/* A clearly visible focus ring for keyboard users only (not on mouse click). */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Respect people who ask their OS for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

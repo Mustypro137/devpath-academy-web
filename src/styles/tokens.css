@@ -1,0 +1,76 @@
+/*
+ * Design tokens: every colour, size, and spacing value lives here as a CSS custom property.
+ * Components use var(--token) instead of raw values, so changing a token restyles the whole app.
+ *
+ * Theme rules (see src/features/theme):
+ * - No data-theme attribute  -> follow the operating system (prefers-color-scheme).
+ * - data-theme="light"/"dark" -> the learner's choice on the Settings page wins.
+ * The dark values are repeated twice because CSS can't share a block between a media query and
+ * an attribute selector.
+ */
+
+:root {
+  /* Colours (light). Text colours meet WCAG AA contrast (4.5:1) on both backgrounds. */
+  --color-bg: #ffffff;
+  --color-surface: #f4f5f7;
+  --color-text: #1a1d23;
+  --color-text-muted: #4b5563;
+  --color-border: #d1d5db;
+  --color-accent: #1d4ed8;
+  --color-accent-contrast: #ffffff;
+  --color-accent-soft: #e0e8fd;
+  --color-focus: #1d4ed8;
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Shape and layout */
+  --radius: 0.5rem;
+  --sidebar-width: 15rem;
+  --content-width: 48rem;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #12141a;
+    --color-surface: #1b1e26;
+    --color-text: #e6e8ec;
+    --color-text-muted: #a3aab8;
+    --color-border: #2e333d;
+    --color-accent: #8ab4ff;
+    --color-accent-contrast: #12141a;
+    --color-accent-soft: #1f2a44;
+    --color-focus: #8ab4ff;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #12141a;
+  --color-surface: #1b1e26;
+  --color-text: #e6e8ec;
+  --color-text-muted: #a3aab8;
+  --color-border: #2e333d;
+  --color-accent: #8ab4ff;
+  --color-accent-contrast: #12141a;
+  --color-accent-soft: #1f2a44;
+  --color-focus: #8ab4ff;
+
+  color-scheme: dark;
+}
