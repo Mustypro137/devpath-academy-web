@@ -10,6 +10,7 @@ import { MODULES } from './modules'
 
 export { MODULES }
 export { ASSESSMENT_QUESTIONS, ASSESSMENT_TOPICS } from './assessment'
+export { PROJECT } from './project'
 
 // All lessons in course order: module by module, lessons in file order.
 export const LESSONS: readonly Lesson[] = [...htmlLessons, ...cssLessons, ...jsLessons]

@@ -117,3 +117,27 @@ export interface AssessmentQuestion {
   correctIndex: number // which option is right (0 = the first)
   explanation: string // shown on the results screen
 }
+
+// --- Practical project ------------------------------------------------------------------------
+// One guided project, split into milestones. Each task has its own id, so ticking it can be
+// saved (progress stores which task ids are done).
+
+export interface ProjectTask {
+  id: string // unique across the whole project, e.g. "setup-git"
+  text: string // `backticks` become inline code
+}
+
+export interface ProjectMilestone {
+  id: string
+  title: string
+  goal: string // one sentence: what works when this milestone is done
+  tasks: ProjectTask[]
+  hints: string[] // `backticks` become inline code
+}
+
+export interface Project {
+  id: string
+  title: string
+  brief: string[] // paragraphs introducing the project
+  milestones: ProjectMilestone[]
+}
