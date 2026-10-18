@@ -4,9 +4,9 @@
 
 - The assessment is always on exactly **one** screen: `intro`, `question`, or `results`. Each
   screen has only the data it needs: there is no "current question" on the intro screen.
-- A union type models this: `AssessmentState = { screen: 'intro' } | { screen: 'question', ... }
-| { screen: 'results', ... }`. Checking `state.screen` narrows it, just like the exercise
-  `language` field in M5.
+- A union type models this: `AssessmentState` is one of three shapes, one per screen, told
+  apart by `state.screen`. Checking it narrows the type, just like the exercise `language`
+  field in M5.
 - Every move is an **action** (`start`, `select`, `next`, `back`, `restart`), and the reducer
   decides where it leads. Actions that make no sense on the current screen (e.g. `next` on the
   intro) change nothing.
