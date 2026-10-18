@@ -54,6 +54,7 @@ const completed: Progress = {
       updatedAt: '2026-10-18T16:00:00.000Z',
     },
   },
+  lastVisited: '/learn/js-functions',
 }
 
 // `completed`, with some fields of its one exercise replaced.
@@ -78,6 +79,7 @@ describe('migrate (validation)', () => {
       assessment: { attempts: [] },
       project: { tasks: {}, repoUrl: '' },
       writing: {},
+      lastVisited: '',
     })
   })
 
@@ -100,6 +102,7 @@ describe('migrate (validation)', () => {
     ['assessment without attempts', { version: 1, assessment: {} }],
     ['a project task that is not true/false', { version: 1, project: { tasks: { a: 'yes' } } }],
     ['a project repoUrl that is not text', { version: 1, project: { tasks: {}, repoUrl: 5 } }],
+    ['lastVisited that is not text', { version: 1, lastVisited: 42 }],
     [
       'a writing draft that is not text',
       { version: 1, writing: { a: { draft: 1, checklist: [], updatedAt: 'x' } } },

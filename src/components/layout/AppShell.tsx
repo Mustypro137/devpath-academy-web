@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Outlet } from 'react-router'
+import { useTrackLastVisited } from '../../features/dashboard/useTrackLastVisited'
 import styles from './AppShell.module.css'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
@@ -8,6 +9,7 @@ import { Sidebar } from './Sidebar'
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  useTrackLastVisited() // for the dashboard's "Continue where you left off"
 
   // While the mobile menu is open, the Escape key closes it and returns focus to the button.
   useEffect(() => {

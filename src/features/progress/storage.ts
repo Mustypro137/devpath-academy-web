@@ -27,6 +27,7 @@ export function createEmptyProgress(): Progress {
     assessment: { attempts: [] },
     project: { tasks: {}, repoUrl: '' },
     writing: {},
+    lastVisited: '',
   }
 }
 
@@ -136,10 +137,20 @@ export function migrate(data: unknown): Progress | null {
   const assessment = parseAssessment(data.assessment)
   const project = parseProject(data.project)
   const writing = parseSection(data.writing, isWritingProgress)
+  const lastVisited = data.lastVisited ?? '' // saved before Milestone 9
   if (!lessons || !exercises || !assessment || !project || !writing) return null
+  if (typeof lastVisited !== 'string') return null
 
   // Build a fresh object rather than returning `data`, so unknown extra fields are dropped.
-  return { version: PROGRESS_VERSION, lessons, exercises, assessment, project, writing }
+  return {
+    version: PROGRESS_VERSION,
+    lessons,
+    exercises,
+    assessment,
+    project,
+    writing,
+    lastVisited,
+  }
 }
 
 // --- localStorage -----------------------------------------------------------------------------
