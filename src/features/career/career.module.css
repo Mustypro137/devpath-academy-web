@@ -1,0 +1,137 @@
+/* Styles for the career pages: the prompt list, the writing editor, and the checklist. */
+
+.muted {
+  margin-top: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* --- Prompt list --- */
+
+.category {
+  margin-top: var(--space-8);
+}
+
+.category h2 {
+  margin-bottom: var(--space-1);
+  font-size: var(--text-lg);
+}
+
+.prompts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.promptLink {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+.promptLink:hover {
+  border-color: var(--color-accent);
+}
+
+.promptTitle {
+  font-weight: 600;
+}
+
+.promptStatus {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* --- Writing editor --- */
+
+.section {
+  margin-top: var(--space-8);
+}
+
+.section h2 {
+  font-size: var(--text-lg);
+}
+
+.editorLabel {
+  display: block;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.editorFooter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.count {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+/* --- Checklist --- */
+
+.checklist {
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.checklist legend {
+  padding: 0 var(--space-2);
+  font-weight: 600;
+}
+
+.checkItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+  cursor: pointer;
+}
+
+.checkItem input {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.2rem;
+  accent-color: var(--color-accent);
+}
+
+/* --- Example --- */
+
+.example summary {
+  color: var(--color-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* pre-wrap keeps the example's line breaks and blank lines, but still wraps long lines. */
+.exampleText {
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  border-left: 4px solid var(--color-accent);
+  background: var(--color-surface);
+  white-space: pre-wrap;
+}

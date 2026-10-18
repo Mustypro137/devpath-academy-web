@@ -3,6 +3,33 @@
 Decisions made during implementation that refine or deviate from [`PLAN.md`](PLAN.md).
 Newest first.
 
+## 2026-10-18 — M8: Progress is saved synchronously on every change
+
+- **Context:** Since M3, `ProgressProvider` saved in a `useEffect` after each render. M8's
+  autosave flushes unsaved text when the page closes, but a page that is closing never renders
+  again, so that save never reached `localStorage`.
+- **Decision:** Every action goes through `commit()`, which writes to `localStorage` before
+  updating React state. The latest progress is kept in a ref, so quick changes build on each
+  other.
+- **Consequence:** Supersedes the M3 approach (an effect watching `progress`). Every page that
+  changes progress benefits. Covered by `ProgressProvider.test.tsx`.
+
+## 2026-10-18 — M8: Writing drafts autosave after a pause, and on leaving
+
+- **Context:** M5 kept code saving on every keystroke, because a debounced save could lose the
+  last keystrokes if the tab closed during the delay.
+- **Decision:** Writing drafts use `useAutosave`: they save 0.8 s after typing stops, and
+  immediately when the editor unmounts or the tab fires `pagehide`. Checklist ticks save at once.
+- **Revisit:** The exercise editors (M4/M5) could switch to `useAutosave` too.
+
+## 2026-10-18 — M8: Writing checklist ticks are saved by position
+
+- **Context:** The plan's model is `writing: { [promptId]: { draft, checklist: boolean[], updatedAt } }`.
+- **Decision:** Keep the plan's `boolean[]`: tick `i` belongs to checklist item `i`.
+- **Consequence:** New checklist items must be added at the end of a prompt's list, or saved
+  ticks would line up with the wrong items. A comment in `writingPrompts.ts` says so. (Project
+  tasks use ids instead, because there are many more of them.)
+
 ## 2026-10-18 — M7: Project tasks have ids; the repository link is saved in progress
 
 - **Context:** The plan's model has `tasks: string[]` and `project: { [taskId]: boolean }`, but

@@ -47,10 +47,17 @@ export interface ProjectProgress {
   repoUrl: string // the learner's own repository, '' until they add it
 }
 
+export interface WritingProgress {
+  draft: string
+  checklist: boolean[] // one tick per checklist item, in the prompt's order
+  updatedAt: string // ISO date of the last change
+}
+
 export interface Progress {
   version: typeof PROGRESS_VERSION
   lessons: Record<string, LessonProgress> // keyed by lesson id
   exercises: Record<string, ExerciseProgress> // keyed by exercise id
   assessment: { attempts: AssessmentAttempt[] } // oldest first
   project: ProjectProgress
+  writing: Record<string, WritingProgress> // keyed by writing prompt id
 }

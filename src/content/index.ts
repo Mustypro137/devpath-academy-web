@@ -1,16 +1,18 @@
 // The single entry point for reading course content. Pages import from here, never from the
 // individual lesson files, so the content can be reorganised without touching the pages.
-import type { Exercise, Lesson, Module, ModuleId } from '../types/content'
+import type { Exercise, Lesson, Module, ModuleId, WritingPrompt } from '../types/content'
 import { htmlCssExercises } from './exercises/htmlCss'
 import { jsExercises } from './exercises/js'
 import { cssLessons } from './lessons/css'
 import { htmlLessons } from './lessons/html'
 import { jsLessons } from './lessons/js'
 import { MODULES } from './modules'
+import { WRITING_PROMPTS } from './writingPrompts'
 
 export { MODULES }
 export { ASSESSMENT_QUESTIONS, ASSESSMENT_TOPICS } from './assessment'
 export { PROJECT } from './project'
+export { WRITING_CATEGORIES, WRITING_PROMPTS } from './writingPrompts'
 
 // All lessons in course order: module by module, lessons in file order.
 export const LESSONS: readonly Lesson[] = [...htmlLessons, ...cssLessons, ...jsLessons]
@@ -49,4 +51,8 @@ export function getExercisesForLesson(lesson: Lesson): Exercise[] {
 // The lesson that links to an exercise, used for the "back to lesson" link.
 export function getLessonForExercise(exerciseId: string): Lesson | undefined {
   return LESSONS.find((lesson) => lesson.exerciseIds.includes(exerciseId))
+}
+
+export function getWritingPrompt(id: string | undefined): WritingPrompt | undefined {
+  return WRITING_PROMPTS.find((prompt) => prompt.id === id)
 }

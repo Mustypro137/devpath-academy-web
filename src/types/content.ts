@@ -141,3 +141,18 @@ export interface Project {
   brief: string[] // paragraphs introducing the project
   milestones: ProjectMilestone[]
 }
+
+// --- Career & writing -------------------------------------------------------------------------
+
+export type WritingCategory = 'job-search' | 'teamwork' | 'technical'
+
+export interface WritingPrompt {
+  id: string // used in the URL: /career/<id>
+  category: WritingCategory
+  title: string
+  scenario: string[] // paragraphs: the situation to write for; `backticks` become inline code
+  tips: string[]
+  checklist: string[] // self-review questions; progress saves one tick per item, by position
+  targetWords: { min: number; max: number }
+  example?: string // a sample answer, revealed on request; blank lines separate paragraphs
+}
