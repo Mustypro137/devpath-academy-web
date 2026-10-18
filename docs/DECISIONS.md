@@ -3,6 +3,25 @@
 Decisions made during implementation that refine or deviate from [`PLAN.md`](PLAN.md).
 Newest first.
 
+## 2026-10-18 — M2: Vitest runs in threads, at most half the CPU cores
+
+- **Context:** With the defaults, `npm test` crashed with "Fatal process out of memory" on this
+  8-core / 16 GB machine once the lesson tests were added (one jsdom environment per test file,
+  all started at once).
+- **Decision:** In `vite.config.ts`, set `pool: 'threads'` and `maxWorkers: '50%'`.
+- **Consequence:** Tests run a little slower but reliably. Revisit if the suite grows a lot.
+
+## 2026-10-18 — M2: Lesson content format details
+
+- **Context:** The plan lists the block types as `text | code | callout | heading`.
+- **Decision:**
+  - Added a fifth block type, `list` (bullet points), because almost every lesson needed one.
+  - Inline code inside text is written with `backticks`, rendered by `InlineText` as `<code>`.
+    This is the only formatting inside text: no Markdown parser, as decided in the plan.
+  - Lessons have Previous / Next links that follow course order across modules.
+- **Safety:** All text is rendered by React as text (never as HTML), so a `<script>` in lesson
+  data shows on screen and never runs. A content test fails on an unclosed backtick.
+
 ## 2026-10-18 — M1: React Router 8 needs Node 22.22+
 
 - **Context:** `react-router@8` declares `"node": ">=22.22.0"`. This machine has Node 22.17.1.
