@@ -1,0 +1,47 @@
+.breadcrumb {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.meta {
+  margin-top: calc(-1 * var(--space-2));
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* Previous / next links. Wrap onto two lines on narrow screens. */
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagerLink {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-direction: column;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pagerLink:hover {
+  border-color: var(--color-accent);
+}
+
+.next {
+  margin-left: auto; /* keeps "Next" on the right even when there is no "Previous" */
+  text-align: right;
+}
+
+.pagerLabel {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
