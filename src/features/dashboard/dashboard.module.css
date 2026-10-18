@@ -37,8 +37,10 @@
   margin-top: var(--space-8);
 }
 
+/* :not(.label): ".card h2" is more specific than ".label", so without it the small label style
+   on "Continue where you left off" would lose. */
 .section h2,
-.card h2 {
+.card h2:not(.label) {
   font-size: var(--text-lg);
 }
 
