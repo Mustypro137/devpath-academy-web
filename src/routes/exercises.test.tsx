@@ -50,10 +50,11 @@ function editorText() {
   return editor().state.doc.toString()
 }
 
-// The exercise page is loaded lazily, so wait for its heading before going on.
+// The exercise page is loaded lazily, and CodeMirror is created in an effect after the page
+// appears, so wait for the editor itself before going on.
 async function openExercise(url = path) {
   const result = renderAt(url)
-  await screen.findByRole('heading', { level: 1 })
+  await screen.findByRole('textbox', { name: 'Your code' })
   return result
 }
 
@@ -144,7 +145,9 @@ describe('exercise page (/exercises/:exerciseId)', () => {
   })
 
   it('shows "Exercise not found" for an unknown id', async () => {
-    await openExercise('/exercises/nope')
+    renderAt('/exercises/nope')
+    // findBy waits: the page is loaded lazily. There is no editor on this one.
+    await screen.findByRole('heading', { level: 1 })
     expect(
       screen.getByRole('heading', { level: 1, name: 'Exercise not found' }),
     ).toBeInTheDocument()
