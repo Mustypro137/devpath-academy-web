@@ -7,7 +7,7 @@ describe('routing', () => {
   it.each([
     ['/', 'Dashboard'],
     ['/learn', 'Learn'],
-    ['/learn/html-basics', 'Lesson'],
+    ['/learn/css-box-model', 'The box model'],
     ['/exercises/sum-array', 'Exercise'],
     ['/assessment', 'Skill assessment'],
     ['/project', 'Project: Personal Task Tracker'],
@@ -19,9 +19,9 @@ describe('routing', () => {
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
   })
 
-  it('reads the id from the URL', () => {
-    renderAt('/learn/html-basics')
-    expect(screen.getByText('html-basics')).toBeInTheDocument()
+  it('reads the id from the URL on placeholder pages', () => {
+    renderAt('/exercises/sum-array')
+    expect(screen.getByText('sum-array')).toBeInTheDocument()
   })
 
   it('shows a not-found page for unknown URLs, with a way back', async () => {
@@ -45,7 +45,7 @@ describe('routing', () => {
   })
 
   it('keeps "Learn" marked as current inside a lesson', () => {
-    renderAt('/learn/html-basics')
+    renderAt('/learn/css-box-model')
     const nav = screen.getByRole('navigation', { name: 'Main' })
     expect(within(nav).getByRole('link', { name: 'Learn' })).toHaveAttribute('aria-current', 'page')
   })
