@@ -30,6 +30,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         }
         return { ...current, lessons }
       }),
+    getExerciseProgress: (exerciseId) => progress.exercises[exerciseId],
+    updateExercise: (exerciseId, change) =>
+      setProgress((current) => ({
+        ...current,
+        exercises: { ...current.exercises, [exerciseId]: change(current.exercises[exerciseId]) },
+      })),
     replaceProgress: setProgress,
     resetProgress: () => setProgress(createEmptyProgress()),
   }

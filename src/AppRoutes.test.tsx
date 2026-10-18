@@ -8,20 +8,21 @@ describe('routing', () => {
     ['/', 'Dashboard'],
     ['/learn', 'Learn'],
     ['/learn/css-box-model', 'The box model'],
-    ['/exercises/sum-array', 'Exercise'],
+    ['/exercises/js-double', 'Double it'],
     ['/assessment', 'Skill assessment'],
     ['/project', 'Project: Personal Task Tracker'],
     ['/career', 'Career & writing'],
     ['/career/cover-letter', 'Writing prompt'],
     ['/settings', 'Settings'],
-  ])('%s shows the "%s" page', (path, heading) => {
+  ])('%s shows the "%s" page', async (path, heading) => {
     renderAt(path)
-    expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
+    // findBy waits, because some pages (the exercise page) are loaded lazily.
+    expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
   })
 
   it('reads the id from the URL on placeholder pages', () => {
-    renderAt('/exercises/sum-array')
-    expect(screen.getByText('sum-array')).toBeInTheDocument()
+    renderAt('/career/cover-letter')
+    expect(screen.getByText('cover-letter')).toBeInTheDocument()
   })
 
   it('shows a not-found page for unknown URLs, with a way back', async () => {

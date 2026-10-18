@@ -1,6 +1,7 @@
 // The single entry point for reading course content. Pages import from here, never from the
 // individual lesson files, so the content can be reorganised without touching the pages.
-import type { Lesson, Module, ModuleId } from '../types/content'
+import type { Exercise, Lesson, Module, ModuleId } from '../types/content'
+import { jsExercises } from './exercises/js'
 import { cssLessons } from './lessons/css'
 import { htmlLessons } from './lessons/html'
 import { jsLessons } from './lessons/js'
@@ -28,4 +29,21 @@ export function getAdjacentLessons(id: string): { previous?: Lesson; next?: Less
   const index = LESSONS.findIndex((lesson) => lesson.id === id)
   if (index === -1) return {}
   return { previous: LESSONS[index - 1], next: LESSONS[index + 1] }
+}
+
+export const EXERCISES: readonly Exercise[] = [...jsExercises]
+
+export function getExercise(id: string | undefined): Exercise | undefined {
+  return EXERCISES.find((exercise) => exercise.id === id)
+}
+
+// The exercises listed on a lesson, in the lesson's order. Unknown ids are skipped (and caught
+// by content.test.ts).
+export function getExercisesForLesson(lesson: Lesson): Exercise[] {
+  return lesson.exerciseIds.flatMap((id) => getExercise(id) ?? [])
+}
+
+// The lesson that links to an exercise, used for the "back to lesson" link.
+export function getLessonForExercise(exerciseId: string): Lesson | undefined {
+  return LESSONS.find((lesson) => lesson.exerciseIds.includes(exerciseId))
 }

@@ -7,6 +7,7 @@ import type { Progress } from '../types/progress'
 const SAVED: Progress = {
   version: 1,
   lessons: { 'html-what-is-html': { completedAt: '2026-10-18T12:00:00.000Z' } },
+  exercises: {},
 }
 
 // Starts the app with progress already saved, like a returning learner.

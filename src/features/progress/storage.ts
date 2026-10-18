@@ -1,13 +1,22 @@
 // The ONLY code that reads or writes saved progress. Everything else goes through useProgress().
 // If progress moves to a server later, only this file needs to change.
-import { PROGRESS_VERSION, type LessonProgress, type Progress } from '../../types/progress'
+import {
+  PROGRESS_VERSION,
+  type ExerciseProgress,
+  type LessonProgress,
+  type Progress,
+  type Submission,
+} from '../../types/progress'
 
 export const PROGRESS_STORAGE_KEY = 'devpath-progress'
 // Unreadable saved data is copied here before we start fresh, so it isn't lost for good.
 export const CORRUPT_BACKUP_KEY = 'devpath-progress-corrupt'
 
+// Older submissions are dropped, so saved data (and exported files) stay small.
+export const MAX_SUBMISSIONS = 10
+
 export function createEmptyProgress(): Progress {
-  return { version: PROGRESS_VERSION, lessons: {} }
+  return { version: PROGRESS_VERSION, lessons: {}, exercises: {} }
 }
 
 // --- Validation -------------------------------------------------------------------------------
@@ -22,10 +31,42 @@ function isLessonProgress(value: unknown): value is LessonProgress {
   return isRecord(value) && typeof value.completedAt === 'string'
 }
 
-function parseLessons(value: unknown): Progress['lessons'] | null {
-  if (value === undefined) return {} // section missing: treat as empty
+const OUTCOMES: readonly unknown[] = ['passed', 'failed', 'error', 'timeout']
+
+function isSubmission(value: unknown): value is Submission {
+  return (
+    isRecord(value) &&
+    typeof value.submittedAt === 'string' &&
+    typeof value.code === 'string' &&
+    OUTCOMES.includes(value.outcome) &&
+    typeof value.passedCount === 'number' &&
+    typeof value.testCount === 'number'
+  )
+}
+
+function isExerciseProgress(value: unknown): value is ExerciseProgress {
+  return (
+    isRecord(value) &&
+    (value.status === 'in-progress' || value.status === 'passed') &&
+    typeof value.attempts === 'number' &&
+    typeof value.hintsUsed === 'number' &&
+    typeof value.lastCode === 'string' &&
+    (value.solvedAt === undefined || typeof value.solvedAt === 'string') &&
+    typeof value.solutionViewed === 'boolean' &&
+    Array.isArray(value.submissions) &&
+    value.submissions.every(isSubmission)
+  )
+}
+
+// Checks one section: a record whose every value passes `isItem`.
+// A missing section is treated as empty, so data saved before the section existed still loads.
+function parseSection<T>(
+  value: unknown,
+  isItem: (item: unknown) => item is T,
+): Record<string, T> | null {
+  if (value === undefined) return {}
   if (!isRecord(value)) return null
-  return Object.values(value).every(isLessonProgress) ? (value as Progress['lessons']) : null
+  return Object.values(value).every(isItem) ? (value as Record<string, T>) : null
 }
 
 // Turns any value into valid Progress, or null if it can't be trusted.
@@ -35,11 +76,12 @@ export function migrate(data: unknown): Progress | null {
   if (!isRecord(data)) return null
   if (data.version !== PROGRESS_VERSION) return null // unknown, or from a newer app version
 
-  const lessons = parseLessons(data.lessons)
-  if (!lessons) return null
+  const lessons = parseSection(data.lessons, isLessonProgress)
+  const exercises = parseSection(data.exercises, isExerciseProgress)
+  if (!lessons || !exercises) return null
 
   // Build a fresh object rather than returning `data`, so unknown extra fields are dropped.
-  return { version: PROGRESS_VERSION, lessons }
+  return { version: PROGRESS_VERSION, lessons, exercises }
 }
 
 // --- localStorage -----------------------------------------------------------------------------

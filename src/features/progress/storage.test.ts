@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { Progress } from '../../types/progress'
 import {
   CORRUPT_BACKUP_KEY,
   createEmptyProgress,
@@ -10,10 +11,35 @@ import {
   saveProgress,
 } from './storage'
 
-const completed = {
+const completed: Progress = {
   version: 1,
   lessons: { 'css-box-model': { completedAt: '2026-10-18T13:00:00.000Z' } },
-} as const
+  exercises: {
+    'js-double': {
+      status: 'passed',
+      attempts: 2,
+      hintsUsed: 1,
+      lastCode: 'const double = (n) => n * 2',
+      solvedAt: '2026-10-18T14:00:00.000Z',
+      solutionViewed: false,
+      submissions: [
+        {
+          submittedAt: '2026-10-18T14:00:00.000Z',
+          code: 'const double = (n) => n * 2',
+          outcome: 'passed',
+          passedCount: 3,
+          testCount: 3,
+        },
+      ],
+    },
+  },
+}
+
+// `completed`, with some fields of its one exercise replaced.
+function withExercise(fields: Record<string, unknown>) {
+  const exercise = { ...completed.exercises['js-double'], ...fields }
+  return { ...completed, exercises: { 'js-double': exercise } }
+}
 
 describe('migrate (validation)', () => {
   it('accepts valid progress', () => {
@@ -22,6 +48,13 @@ describe('migrate (validation)', () => {
 
   it('fills in a missing section as empty', () => {
     expect(migrate({ version: 1 })).toEqual(createEmptyProgress())
+  })
+
+  it('still loads progress saved before exercises existed (Milestone 3)', () => {
+    expect(migrate({ version: 1, lessons: completed.lessons })).toEqual({
+      ...completed,
+      exercises: {},
+    })
   })
 
   it('drops unknown extra fields', () => {
@@ -37,6 +70,9 @@ describe('migrate (validation)', () => {
     ['lessons as an array', { version: 1, lessons: [] }],
     ['a lesson without completedAt', { version: 1, lessons: { a: {} } }],
     ['a non-string completedAt', { version: 1, lessons: { a: { completedAt: 5 } } }],
+    ['an exercise with an unknown status', withExercise({ status: 'done' })],
+    ['an exercise without lastCode', withExercise({ lastCode: undefined })],
+    ['a submission with an unknown outcome', withExercise({ submissions: [{ outcome: 'meh' }] })],
   ])('rejects %s', (_label, value) => {
     expect(migrate(value)).toBeNull()
   })

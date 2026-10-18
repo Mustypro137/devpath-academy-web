@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router'
-import { getAdjacentLessons, getLesson, getModule } from '../content'
+import { getAdjacentLessons, getExercisesForLesson, getLesson, getModule } from '../content'
 import { LessonContent } from '../features/lessons/LessonContent'
 import { useProgress } from '../features/progress/useProgress'
 import styles from './LessonPage.module.css'
@@ -8,7 +8,7 @@ export function LessonPage() {
   // useParams reads the :lessonId part of the URL, e.g. /learn/css-box-model → "css-box-model".
   const { lessonId } = useParams()
   const lesson = getLesson(lessonId)
-  const { isLessonComplete, setLessonComplete } = useProgress()
+  const { isLessonComplete, setLessonComplete, getExerciseProgress } = useProgress()
 
   // A URL can contain anything, so handle lessons that don't exist.
   if (!lesson) {
@@ -25,6 +25,7 @@ export function LessonPage() {
 
   const module = getModule(lesson.moduleId)
   const { previous, next } = getAdjacentLessons(lesson.id)
+  const exercises = getExercisesForLesson(lesson)
 
   return (
     <article>
@@ -35,6 +36,26 @@ export function LessonPage() {
       <p className={styles.meta}>{lesson.estimatedMinutes} min read</p>
 
       <LessonContent blocks={lesson.blocks} />
+
+      {exercises.length > 0 && (
+        <section aria-labelledby="practice-heading">
+          <h2 id="practice-heading">Practice</h2>
+          <ul className={styles.exercises}>
+            {exercises.map((exercise) => (
+              <li key={exercise.id}>
+                <Link to={`/exercises/${exercise.id}`}>{exercise.title}</Link>
+                {getExerciseProgress(exercise.id)?.status === 'passed' && (
+                  <>
+                    {' '}
+                    <span aria-hidden="true">✓</span>
+                    <span className="visually-hidden">(passed)</span>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* A checkbox (not a button) because it is an on/off state, and screen readers say so. */}
       <label className={styles.complete}>

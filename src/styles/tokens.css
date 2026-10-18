@@ -21,6 +21,14 @@
   --color-accent-soft: #e0e8fd;
   --color-focus: #1d4ed8;
   --color-warning: #b45309;
+  --color-success: #047857;
+
+  /* Code editor syntax colours (all ≥ 4.5:1 on --color-bg and --color-surface) */
+  --code-keyword: #6d28d9;
+  --code-string: #047857;
+  --code-number: #9a3412;
+  --code-comment: #4b5563;
+  --code-function: #1d4ed8;
 
   /* Typography */
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -58,6 +66,12 @@
     --color-accent-soft: #1f2a44;
     --color-focus: #8ab4ff;
     --color-warning: #f5b14c;
+    --color-success: #6ee7b7;
+    --code-keyword: #c4b5fd;
+    --code-string: #86efac;
+    --code-number: #fdba74;
+    --code-comment: #a3aab8;
+    --code-function: #8ab4ff;
 
     color-scheme: dark;
   }
@@ -74,6 +88,12 @@
   --color-accent-soft: #1f2a44;
   --color-focus: #8ab4ff;
   --color-warning: #f5b14c;
+  --color-success: #6ee7b7;
+  --code-keyword: #c4b5fd;
+  --code-string: #86efac;
+  --code-number: #fdba74;
+  --code-comment: #a3aab8;
+  --code-function: #8ab4ff;
 
   color-scheme: dark;
 }

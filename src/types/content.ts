@@ -49,5 +49,31 @@ export interface Lesson {
   summary: string
   estimatedMinutes: number
   blocks: LessonBlock[]
-  exerciseIds: string[] // filled in from Milestone 4
+  exerciseIds: string[] // exercises to practise with after reading, in order
 }
+
+// --- Exercises --------------------------------------------------------------------------------
+// A JavaScript exercise asks the learner to write one function. Each test calls it with `args`
+// and compares the return value with `expected`. HTML/CSS exercises (Milestone 5) will add a
+// second shape to the `Exercise` union.
+
+export interface JsTestCase {
+  description: string // shown in the results, e.g. "greet('Ada') returns 'Hello, Ada!'"
+  args: unknown[] // the arguments to call the function with
+  expected: unknown // what it should return
+}
+
+export interface JsExercise {
+  id: string // used in the URL: /exercises/<id>
+  language: 'js'
+  title: string
+  instructions: string[] // paragraphs; `backticks` become inline code
+  functionName: string // the function the tests call
+  starterCode: string
+  tests: JsTestCase[]
+  hints: string[] // shown one at a time, in order
+  solution: string
+  explanation: string // why the solution works, shown with it
+}
+
+export type Exercise = JsExercise
