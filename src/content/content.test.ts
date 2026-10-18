@@ -4,6 +4,8 @@ import { loadFunction, runTests } from '../features/exercises/checker'
 import { checkDocument } from '../features/exercises/domChecks'
 import type { Exercise } from '../types/content'
 import {
+  ASSESSMENT_QUESTIONS,
+  ASSESSMENT_TOPICS,
   EXERCISES,
   getAdjacentLessons,
   getExercisesForLesson,
@@ -125,6 +127,51 @@ describe('exercises', () => {
       for (const text of [...exercise.instructions, ...exercise.hints, exercise.explanation]) {
         const backticks = text.split('`').length - 1
         expect(backticks % 2, `Unbalanced backtick in "${exercise.id}": ${text}`).toBe(0)
+      }
+    }
+  })
+})
+
+describe('assessment questions', () => {
+  it('has around 15 questions with unique ids', () => {
+    expect(ASSESSMENT_QUESTIONS.length).toBeGreaterThanOrEqual(12)
+    expect(ASSESSMENT_QUESTIONS.length).toBeLessThanOrEqual(18)
+    const ids = ASSESSMENT_QUESTIONS.map((question) => question.id)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('gives every question distinct options and a valid correct answer', () => {
+    for (const question of ASSESSMENT_QUESTIONS) {
+      expect(question.options.length, question.id).toBeGreaterThanOrEqual(2)
+      expect(new Set(question.options).size, question.id).toBe(question.options.length)
+      expect(question.correctIndex, question.id).toBeGreaterThanOrEqual(0)
+      expect(question.correctIndex, question.id).toBeLessThan(question.options.length)
+    }
+  })
+
+  it('covers every topic with at least three questions', () => {
+    for (const topic of Object.keys(ASSESSMENT_TOPICS)) {
+      const count = ASSESSMENT_QUESTIONS.filter((question) => question.topic === topic).length
+      expect(count, topic).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it('links every topic to a real lesson', () => {
+    for (const { lessonId } of Object.values(ASSESSMENT_TOPICS)) {
+      expect(getLesson(lessonId), lessonId).toBeDefined()
+    }
+  })
+
+  it("doesn't always put the right answer in the same place", () => {
+    const positions = new Set(ASSESSMENT_QUESTIONS.map((question) => question.correctIndex))
+    expect(positions.size).toBeGreaterThanOrEqual(3)
+  })
+
+  it('closes every `inline code` backtick', () => {
+    for (const question of ASSESSMENT_QUESTIONS) {
+      for (const text of [question.prompt, ...question.options, question.explanation]) {
+        const backticks = text.split('`').length - 1
+        expect(backticks % 2, `Unbalanced backtick in "${question.id}": ${text}`).toBe(0)
       }
     }
   })
