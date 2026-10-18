@@ -7,7 +7,7 @@ export const htmlLessons: Lesson[] = [
     title: 'What HTML is',
     summary: 'Elements, tags, attributes, and the skeleton every page shares.',
     estimatedMinutes: 10,
-    exerciseIds: [],
+    exerciseIds: ['html-first-page', 'html-link'],
     blocks: [
       {
         type: 'text',
@@ -70,7 +70,7 @@ export const htmlLessons: Lesson[] = [
     title: 'Semantic HTML',
     summary: 'Choosing elements for their meaning, and why it matters.',
     estimatedMinutes: 12,
-    exerciseIds: [],
+    exerciseIds: ['html-page-layout'],
     blocks: [
       {
         type: 'text',

@@ -1,6 +1,7 @@
 // The single entry point for reading course content. Pages import from here, never from the
 // individual lesson files, so the content can be reorganised without touching the pages.
 import type { Exercise, Lesson, Module, ModuleId } from '../types/content'
+import { htmlCssExercises } from './exercises/htmlCss'
 import { jsExercises } from './exercises/js'
 import { cssLessons } from './lessons/css'
 import { htmlLessons } from './lessons/html'
@@ -31,7 +32,7 @@ export function getAdjacentLessons(id: string): { previous?: Lesson; next?: Less
   return { previous: LESSONS[index - 1], next: LESSONS[index + 1] }
 }
 
-export const EXERCISES: readonly Exercise[] = [...jsExercises]
+export const EXERCISES: readonly Exercise[] = [...htmlCssExercises, ...jsExercises]
 
 export function getExercise(id: string | undefined): Exercise | undefined {
   return EXERCISES.find((exercise) => exercise.id === id)
