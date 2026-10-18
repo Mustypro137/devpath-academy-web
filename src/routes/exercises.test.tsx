@@ -31,6 +31,13 @@ function editorText() {
   return editor().state.doc.toString()
 }
 
+// The exercise page is loaded lazily, so wait for its heading before going on.
+async function openExercise(url = path) {
+  const result = renderAt(url)
+  await screen.findByRole('heading', { level: 1 })
+  return result
+}
+
 // The explanation has `inline code`, which splits it across elements, so match a plain phrase.
 const explanation = /single expression and no braces/
 
@@ -39,8 +46,8 @@ afterEach(() => {
 })
 
 describe('exercise page (/exercises/:exerciseId)', () => {
-  it('shows the instructions, the starter code, and a link back to the lesson', () => {
-    renderAt(path)
+  it('shows the instructions, the starter code, and a link back to the lesson', async () => {
+    await openExercise()
     expect(screen.getByRole('heading', { level: 1, name: exercise.title })).toBeInTheDocument()
     expect(screen.getByText('Not attempted yet')).toBeInTheDocument()
     expect(editorText()).toBe(exercise.starterCode)
@@ -51,7 +58,7 @@ describe('exercise page (/exercises/:exerciseId)', () => {
   })
 
   it('shows which tests failed, and what came back instead', async () => {
-    const { user } = renderAt(path)
+    const { user } = await openExercise()
     typeCode('const double = (n) => n + 4')
     await user.click(screen.getByRole('button', { name: 'Run tests' }))
 
@@ -65,7 +72,7 @@ describe('exercise page (/exercises/:exerciseId)', () => {
   })
 
   it('passes with a correct solution and records the run in the history', async () => {
-    const { user } = renderAt(path)
+    const { user } = await openExercise()
     typeCode(exercise.solution)
     await user.click(screen.getByRole('button', { name: 'Run tests' }))
 
@@ -76,30 +83,30 @@ describe('exercise page (/exercises/:exerciseId)', () => {
   })
 
   it('explains a code error', async () => {
-    const { user } = renderAt(path)
+    const { user } = await openExercise()
     typeCode('const double = (n) =>')
     await user.click(screen.getByRole('button', { name: 'Run tests' }))
     expect(await screen.findByText(/Your code couldn’t run/)).toHaveTextContent('SyntaxError')
   })
 
   it('stops code that never finishes', async () => {
-    const { user } = renderAt(path)
+    const { user } = await openExercise()
     typeCode('const double = (n) => { while (true) {} }')
     await user.click(screen.getByRole('button', { name: 'Run tests' }))
     expect(await screen.findByText(/so it was stopped/)).toBeInTheDocument()
   })
 
-  it('keeps the code after a reload', () => {
-    const { unmount } = renderAt(path)
+  it('keeps the code after a reload', async () => {
+    const { unmount } = await openExercise()
     typeCode('const double = (n) => n * 3')
     unmount()
 
-    renderAt(path)
+    await openExercise()
     expect(editorText()).toBe('const double = (n) => n * 3')
   })
 
   it('loads an earlier run back into the editor', async () => {
-    const { user } = renderAt(path)
+    const { user } = await openExercise()
     typeCode('const double = (n) => n + 4')
     await user.click(screen.getByRole('button', { name: 'Run tests' }))
     await screen.findByText('1 of 3 tests passed.')
@@ -110,15 +117,15 @@ describe('exercise page (/exercises/:exerciseId)', () => {
   })
 
   it('starts over with the starter code after confirming', async () => {
-    const { user } = renderAt(path)
+    const { user } = await openExercise()
     typeCode('my code')
     vi.spyOn(window, 'confirm').mockReturnValue(true)
     await user.click(screen.getByRole('button', { name: 'Start over' }))
     expect(editorText()).toBe(exercise.starterCode)
   })
 
-  it('shows "Exercise not found" for an unknown id', () => {
-    renderAt('/exercises/nope')
+  it('shows "Exercise not found" for an unknown id', async () => {
+    await openExercise('/exercises/nope')
     expect(
       screen.getByRole('heading', { level: 1, name: 'Exercise not found' }),
     ).toBeInTheDocument()
@@ -127,7 +134,7 @@ describe('exercise page (/exercises/:exerciseId)', () => {
 
 describe('hints and solution', () => {
   it('reveals hints one at a time, then unlocks the solution', async () => {
-    const { user } = renderAt(path)
+    const { user } = await openExercise()
     const hints = screen.getByRole('region', { name: 'Hints' })
     const solution = screen.getByRole('region', { name: 'Solution' })
 
@@ -147,7 +154,7 @@ describe('hints and solution', () => {
   })
 
   it('shows the solution only after confirming, and remembers it was viewed', async () => {
-    const { user, unmount } = renderAt(path)
+    const { user, unmount } = await openExercise()
     const showHints = async () => {
       for (let i = 0; i < exercise.hints.length; i++) {
         await user.click(screen.getByRole('button', { name: /Show hint/ }))
@@ -170,7 +177,7 @@ describe('hints and solution', () => {
 
     // Hints and the solution stay revealed after a reload.
     unmount()
-    renderAt(path)
+    await openExercise()
     expect(screen.getByText(explanation)).toBeInTheDocument()
     expect(screen.getByText('That was the last hint.')).toBeInTheDocument()
   })

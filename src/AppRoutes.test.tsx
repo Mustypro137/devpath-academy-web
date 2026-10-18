@@ -14,9 +14,10 @@ describe('routing', () => {
     ['/career', 'Career & writing'],
     ['/career/cover-letter', 'Writing prompt'],
     ['/settings', 'Settings'],
-  ])('%s shows the "%s" page', (path, heading) => {
+  ])('%s shows the "%s" page', async (path, heading) => {
     renderAt(path)
-    expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
+    // findBy waits, because some pages (the exercise page) are loaded lazily.
+    expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
   })
 
   it('reads the id from the URL on placeholder pages', () => {
