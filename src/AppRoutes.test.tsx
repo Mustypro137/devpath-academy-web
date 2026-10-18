@@ -12,17 +12,12 @@ describe('routing', () => {
     ['/assessment', 'Skill assessment'],
     ['/project', 'Project: Personal Task Tracker'],
     ['/career', 'Career & writing'],
-    ['/career/cover-letter', 'Writing prompt'],
+    ['/career/cover-letter', 'A short cover letter'],
     ['/settings', 'Settings'],
   ])('%s shows the "%s" page', async (path, heading) => {
     renderAt(path)
     // findBy waits, because some pages (the exercise page) are loaded lazily.
     expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
-  })
-
-  it('reads the id from the URL on placeholder pages', () => {
-    renderAt('/career/cover-letter')
-    expect(screen.getByText('cover-letter')).toBeInTheDocument()
   })
 
   it('shows a not-found page for unknown URLs, with a way back', async () => {
