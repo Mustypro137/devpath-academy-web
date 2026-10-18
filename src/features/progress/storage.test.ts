@@ -47,6 +47,13 @@ const completed: Progress = {
     tasks: { 'setup-git': true, 'setup-folder': false },
     repoUrl: 'https://github.com/me/tt',
   },
+  writing: {
+    'cover-letter': {
+      draft: 'Dear team',
+      checklist: [true, false],
+      updatedAt: '2026-10-18T16:00:00.000Z',
+    },
+  },
 }
 
 // `completed`, with some fields of its one exercise replaced.
@@ -70,6 +77,7 @@ describe('migrate (validation)', () => {
       exercises: {},
       assessment: { attempts: [] },
       project: { tasks: {}, repoUrl: '' },
+      writing: {},
     })
   })
 
@@ -92,6 +100,14 @@ describe('migrate (validation)', () => {
     ['assessment without attempts', { version: 1, assessment: {} }],
     ['a project task that is not true/false', { version: 1, project: { tasks: { a: 'yes' } } }],
     ['a project repoUrl that is not text', { version: 1, project: { tasks: {}, repoUrl: 5 } }],
+    [
+      'a writing draft that is not text',
+      { version: 1, writing: { a: { draft: 1, checklist: [], updatedAt: 'x' } } },
+    ],
+    [
+      'a writing checklist with non-booleans',
+      { version: 1, writing: { a: { draft: '', checklist: ['yes'], updatedAt: 'x' } } },
+    ],
     [
       'an attempt without byTopic',
       { version: 1, assessment: { attempts: [{ completedAt: 'x', correct: 1, total: 2 }] } },

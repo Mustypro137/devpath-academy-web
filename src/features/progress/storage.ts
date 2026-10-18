@@ -9,6 +9,7 @@ import {
   type ProjectProgress,
   type Submission,
   type TopicScore,
+  type WritingProgress,
 } from '../../types/progress'
 
 export const PROGRESS_STORAGE_KEY = 'devpath-progress'
@@ -25,6 +26,7 @@ export function createEmptyProgress(): Progress {
     exercises: {},
     assessment: { attempts: [] },
     project: { tasks: {}, repoUrl: '' },
+    writing: {},
   }
 }
 
@@ -94,6 +96,16 @@ function isBoolean(value: unknown): value is boolean {
   return typeof value === 'boolean'
 }
 
+function isWritingProgress(value: unknown): value is WritingProgress {
+  return (
+    isRecord(value) &&
+    typeof value.draft === 'string' &&
+    Array.isArray(value.checklist) &&
+    value.checklist.every(isBoolean) &&
+    typeof value.updatedAt === 'string'
+  )
+}
+
 function parseProject(value: unknown): ProjectProgress | null {
   if (value === undefined) return { tasks: {}, repoUrl: '' } // saved before Milestone 7
   if (!isRecord(value)) return null
@@ -123,10 +135,11 @@ export function migrate(data: unknown): Progress | null {
   const exercises = parseSection(data.exercises, isExerciseProgress)
   const assessment = parseAssessment(data.assessment)
   const project = parseProject(data.project)
-  if (!lessons || !exercises || !assessment || !project) return null
+  const writing = parseSection(data.writing, isWritingProgress)
+  if (!lessons || !exercises || !assessment || !project || !writing) return null
 
   // Build a fresh object rather than returning `data`, so unknown extra fields are dropped.
-  return { version: PROGRESS_VERSION, lessons, exercises, assessment, project }
+  return { version: PROGRESS_VERSION, lessons, exercises, assessment, project, writing }
 }
 
 // --- localStorage -----------------------------------------------------------------------------

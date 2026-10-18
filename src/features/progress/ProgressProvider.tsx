@@ -48,6 +48,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       })),
     setProjectRepoUrl: (repoUrl) =>
       setProgress((current) => ({ ...current, project: { ...current.project, repoUrl } })),
+    updateWriting: (promptId, change) =>
+      setProgress((current) => ({
+        ...current,
+        writing: { ...current.writing, [promptId]: change(current.writing[promptId]) },
+      })),
     replaceProgress: setProgress,
     resetProgress: () => setProgress(createEmptyProgress()),
   }

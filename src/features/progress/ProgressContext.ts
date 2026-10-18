@@ -1,5 +1,10 @@
 import { createContext } from 'react'
-import type { AssessmentAttempt, ExerciseProgress, Progress } from '../../types/progress'
+import type {
+  AssessmentAttempt,
+  ExerciseProgress,
+  Progress,
+  WritingProgress,
+} from '../../types/progress'
 
 // Everything a component can read or do with progress.
 export interface ProgressContextValue {
@@ -16,6 +21,11 @@ export interface ProgressContextValue {
   recordAssessmentAttempt: (attempt: AssessmentAttempt) => void
   setProjectTask: (taskId: string, done: boolean) => void
   setProjectRepoUrl: (url: string) => void
+  // Like updateExercise: `change` gets the current entry (or undefined) and returns the new one.
+  updateWriting: (
+    promptId: string,
+    change: (current: WritingProgress | undefined) => WritingProgress,
+  ) => void
   replaceProgress: (progress: Progress) => void // used by import
   resetProgress: () => void
 }

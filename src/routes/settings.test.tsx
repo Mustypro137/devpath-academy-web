@@ -10,6 +10,7 @@ const SAVED: Progress = {
   exercises: {},
   assessment: { attempts: [] },
   project: { tasks: {}, repoUrl: '' },
+  writing: {},
 }
 
 // Starts the app with progress already saved, like a returning learner.
