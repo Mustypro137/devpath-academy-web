@@ -8,7 +8,7 @@ describe('routing', () => {
     ['/', 'Dashboard'],
     ['/learn', 'Learn'],
     ['/learn/css-box-model', 'The box model'],
-    ['/exercises/sum-array', 'Exercise'],
+    ['/exercises/js-double', 'Double it'],
     ['/assessment', 'Skill assessment'],
     ['/project', 'Project: Personal Task Tracker'],
     ['/career', 'Career & writing'],
@@ -20,8 +20,8 @@ describe('routing', () => {
   })
 
   it('reads the id from the URL on placeholder pages', () => {
-    renderAt('/exercises/sum-array')
-    expect(screen.getByText('sum-array')).toBeInTheDocument()
+    renderAt('/career/cover-letter')
+    expect(screen.getByText('cover-letter')).toBeInTheDocument()
   })
 
   it('shows a not-found page for unknown URLs, with a way back', async () => {
