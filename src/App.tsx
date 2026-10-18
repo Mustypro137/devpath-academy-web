@@ -1,11 +1,12 @@
-// Placeholder page for Milestone 0. Replaced by the real layout and routes in M1.
+import { BrowserRouter } from 'react-router'
+import { AppRoutes } from './AppRoutes'
+
+// BrowserRouter keeps the UI in sync with the address bar, so Back, refresh, and bookmarks work.
 function App() {
   return (
-    <main>
-      <h1>DevPath Academy</h1>
-      <p>Learn web development by reading, coding, and building.</p>
-      <p>Coming soon: lessons, exercises, a skill assessment, and a guided project.</p>
-    </main>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   )
 }
 

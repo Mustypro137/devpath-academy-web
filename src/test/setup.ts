@@ -3,7 +3,9 @@ import '@testing-library/jest-dom/vitest' // adds matchers like toBeInTheDocumen
 import { cleanup } from '@testing-library/react'
 import { afterEach } from 'vitest'
 
-// Remove anything rendered by one test so it can't leak into the next.
+// Remove anything one test created so it can't leak into the next.
 afterEach(() => {
   cleanup()
+  localStorage.clear()
+  delete document.documentElement.dataset.theme
 })

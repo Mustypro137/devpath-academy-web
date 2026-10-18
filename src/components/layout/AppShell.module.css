@@ -1,0 +1,57 @@
+/*
+ * CSS Grid lays out the page's big regions. grid-template-areas names them, so the layout
+ * reads like a picture. Mobile first: everything in one column.
+ */
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* minmax(0, ...) stops wide content forcing a scrollbar */
+  grid-template-areas:
+    'header'
+    'nav'
+    'main';
+  grid-template-rows: auto auto 1fr; /* only the main row grows to fill the screen */
+  min-height: 100vh;
+}
+
+.main {
+  grid-area: main;
+  width: 100%;
+  max-width: var(--content-width);
+  padding: var(--space-6) var(--space-4);
+}
+
+.main:focus {
+  outline: none; /* focus lands here only via the skip link; the ring would just be noise */
+}
+
+/* Hidden off-screen until it receives keyboard focus. */
+.skipLink {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 10;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  transform: translateY(-200%);
+}
+
+.skipLink:focus {
+  transform: none;
+}
+
+/* Tablet and up: sidebar on the left, page on the right. */
+@media (min-width: 768px) {
+  .shell {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    grid-template-areas:
+      'header header'
+      'nav main';
+    grid-template-rows: auto 1fr;
+  }
+
+  .main {
+    padding: var(--space-8);
+  }
+}
