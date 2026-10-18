@@ -29,8 +29,22 @@ export interface ExerciseProgress {
   submissions: Submission[] // newest first
 }
 
+export interface TopicScore {
+  correct: number
+  total: number
+}
+
+// One completed skill assessment.
+export interface AssessmentAttempt {
+  completedAt: string // ISO date
+  correct: number // questions answered correctly, out of `total`
+  total: number
+  byTopic: Record<string, TopicScore> // keyed by topic, e.g. "functions"
+}
+
 export interface Progress {
   version: typeof PROGRESS_VERSION
   lessons: Record<string, LessonProgress> // keyed by lesson id
   exercises: Record<string, ExerciseProgress> // keyed by exercise id
+  assessment: { attempts: AssessmentAttempt[] } // oldest first
 }
