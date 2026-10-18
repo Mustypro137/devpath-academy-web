@@ -3,6 +3,28 @@
 Decisions made during implementation that refine or deviate from [`PLAN.md`](PLAN.md).
 Newest first.
 
+## 2026-10-18 — M9: "Up next" follows the course order
+
+- **Decision:** `nextStep` suggests:
+  1. the assessment for a learner who hasn't started anything
+  2. otherwise, the first unread lesson in course order, or the unpassed exercises of a lesson
+     already read
+  3. then the current project milestone
+  4. then the first unfinished writing prompt
+  5. then a congratulation
+- **Why:** One predictable path through the course, easy to test for new, partway, and finished
+  learners. The assessment's own topic-based recommendation stays on its results screen.
+- **Revisit:** Use the latest assessment result to skip ahead for strong learners.
+
+## 2026-10-18 — M9: `lastVisited` is an address, recorded centrally
+
+- **Context:** The plan's model has `lastVisited: string`.
+- **Decision:** It holds the address of the last lesson, exercise, writing prompt, or project
+  page, recorded by one hook in `AppShell`. The dashboard looks up the title from the content
+  when it shows it. A missing field loads as `''`.
+- **Consequence:** Renamed content shows its new title, and removed content is ignored. The
+  assessment isn't recorded: its in-progress state isn't saved, so there is nothing to resume.
+
 ## 2026-10-18 — M8: Progress is saved synchronously on every change
 
 - **Context:** Since M3, `ProgressProvider` saved in a `useEffect` after each render. M8's
