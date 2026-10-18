@@ -29,6 +29,7 @@ const editorTheme = EditorView.theme({
     fontSize: 'var(--text-sm)',
   },
   '.cm-content': { fontFamily: 'var(--font-mono)', caretColor: 'var(--color-text)' },
+  '.cm-content, .cm-gutter': { minHeight: '10rem' }, // room to write, even for short starter code
   '.cm-gutters': {
     backgroundColor: 'var(--color-surface)',
     color: 'var(--color-text-muted)',

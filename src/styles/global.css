@@ -31,8 +31,12 @@ a {
   color: var(--color-accent);
 }
 
-code {
+code,
+pre,
+.cm-content {
   font-family: var(--font-mono);
+  /* Show code exactly as typed: some fonts (e.g. Cascadia Code) draw => as a single arrow. */
+  font-variant-ligatures: none;
 }
 
 button {
