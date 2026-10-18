@@ -1,4 +1,5 @@
 import { indentWithTab } from '@codemirror/commands'
+import { html } from '@codemirror/lang-html'
 import { javascript } from '@codemirror/lang-javascript'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { EditorView, keymap } from '@codemirror/view'
@@ -9,6 +10,7 @@ import styles from './CodeEditor.module.css'
 
 interface CodeEditorProps {
   label: string // read out by screen readers, e.g. "Your code"
+  language: 'js' | 'html' // HTML highlighting includes CSS inside <style>
   value: string
   onChange: (value: string) => void
 }
@@ -20,6 +22,10 @@ const highlightStyle = HighlightStyle.define([
   { tag: [tags.number, tags.bool, tags.null], color: 'var(--code-number)' },
   { tag: tags.comment, color: 'var(--code-comment)', fontStyle: 'italic' },
   { tag: tags.function(tags.variableName), color: 'var(--code-function)' },
+  // HTML and CSS
+  { tag: [tags.tagName, tags.propertyName], color: 'var(--code-keyword)' },
+  { tag: [tags.attributeName, tags.className], color: 'var(--code-function)' },
+  { tag: tags.attributeValue, color: 'var(--code-string)' },
 ])
 
 const editorTheme = EditorView.theme({
@@ -41,7 +47,7 @@ const editorTheme = EditorView.theme({
 
 // A "controlled" editor: the parent owns `value` and hears about every edit through onChange,
 // just like a React <input value onChange>.
-export function CodeEditor({ label, value, onChange }: CodeEditorProps) {
+export function CodeEditor({ label, language, value, onChange }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const helpId = useId()
@@ -60,7 +66,7 @@ export function CodeEditor({ label, value, onChange }: CodeEditorProps) {
       doc: value,
       extensions: [
         basicSetup,
-        javascript(),
+        language === 'js' ? javascript() : html(),
         keymap.of([indentWithTab]),
         syntaxHighlighting(highlightStyle),
         editorTheme,

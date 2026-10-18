@@ -3,6 +3,9 @@ import { act, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getExercise } from '../content'
 import { checkCode, type RunRequest } from '../features/exercises/checker'
+import { checkDocument } from '../features/exercises/domChecks'
+import { PREVIEW_DELAY_MS } from '../features/exercises/HtmlPreview'
+import type { HtmlCssTestCase } from '../types/content'
 import { renderAt } from '../test/renderAt'
 
 // jsdom has no Web Workers, so replace runCode with one that checks the code directly.
@@ -12,6 +15,22 @@ vi.mock('../features/exercises/runner', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../features/exercises/runner')>()),
   runCode: async (request: RunRequest) =>
     request.code.includes('while (true)') ? { status: 'timeout' } : checkCode(request),
+}))
+
+// jsdom won't run the checker iframe's scripts, so check HTML/CSS directly instead: inside a
+// plain iframe, so the app's own page (which has an <h1> too) doesn't get checked by mistake.
+// The iframe messaging is tested on its own in htmlRunner.test.ts.
+vi.mock('../features/exercises/htmlRunner', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../features/exercises/htmlRunner')>()),
+  runHtmlChecks: async (code: string, tests: HtmlCssTestCase[]) => {
+    const iframe = document.createElement('iframe')
+    document.body.append(iframe)
+    const page = iframe.contentDocument!
+    page.body.innerHTML = code
+    const results = checkDocument(page, tests)
+    iframe.remove()
+    return { status: 'done', results }
+  },
 }))
 
 const exercise = getExercise('js-double')!
@@ -31,10 +50,11 @@ function editorText() {
   return editor().state.doc.toString()
 }
 
-// The exercise page is loaded lazily, so wait for its heading before going on.
+// The exercise page is loaded lazily, and CodeMirror is created in an effect after the page
+// appears, so wait for the editor itself before going on.
 async function openExercise(url = path) {
   const result = renderAt(url)
-  await screen.findByRole('heading', { level: 1 })
+  await screen.findByRole('textbox', { name: 'Your code' })
   return result
 }
 
@@ -125,7 +145,9 @@ describe('exercise page (/exercises/:exerciseId)', () => {
   })
 
   it('shows "Exercise not found" for an unknown id', async () => {
-    await openExercise('/exercises/nope')
+    renderAt('/exercises/nope')
+    // findBy waits: the page is loaded lazily. There is no editor on this one.
+    await screen.findByRole('heading', { level: 1 })
     expect(
       screen.getByRole('heading', { level: 1, name: 'Exercise not found' }),
     ).toBeInTheDocument()
@@ -180,5 +202,53 @@ describe('hints and solution', () => {
     await openExercise()
     expect(screen.getByText(explanation)).toBeInTheDocument()
     expect(screen.getByText('That was the last hint.')).toBeInTheDocument()
+  })
+})
+
+describe('HTML/CSS exercise', () => {
+  const htmlExercise = getExercise('css-heading-color')!
+  const htmlPath = `/exercises/${htmlExercise.id}`
+
+  it('checks the page and shows which checks failed', async () => {
+    const { user } = await openExercise(htmlPath)
+    typeCode('<style> h1 { color: rebeccapurple; } </style><h1>Hi</h1><p>Text</p>')
+    await user.click(screen.getByRole('button', { name: 'Run tests' }))
+
+    expect(await screen.findByText('1 of 2 tests passed.')).toBeInTheDocument()
+    const failed = screen.getByText('Paragraphs are 18px').closest('li')!
+    expect(failed).toHaveTextContent('✗ Failed')
+    // A real browser says 16px for the default size; jsdom says "medium".
+    expect(failed).toHaveTextContent(/Expected font-size: 18px, but got font-size: (16px|medium)\./)
+  })
+
+  it('passes with the solution', async () => {
+    const { user } = await openExercise(htmlPath)
+    typeCode(htmlExercise.solution)
+    await user.click(screen.getByRole('button', { name: 'Run tests' }))
+    expect(await screen.findByText('All 2 tests passed. Well done!')).toBeInTheDocument()
+  })
+
+  it('updates the preview after a pause in typing', async () => {
+    await openExercise(htmlPath)
+    const preview = screen.getByTitle('Preview of your page')
+    expect(preview).toHaveAttribute('srcdoc', htmlExercise.starterCode)
+
+    vi.useFakeTimers()
+    typeCode('<h1>New</h1>')
+    expect(preview).toHaveAttribute('srcdoc', htmlExercise.starterCode) // not yet
+    act(() => vi.advanceTimersByTime(PREVIEW_DELAY_MS))
+    expect(preview).toHaveAttribute('srcdoc', '<h1>New</h1>')
+    vi.useRealTimers()
+  })
+
+  it('locks the preview down completely', async () => {
+    await openExercise(htmlPath)
+    // An empty sandbox: no scripts, no same-origin access, no forms, no navigation.
+    expect(screen.getByTitle('Preview of your page')).toHaveAttribute('sandbox', '')
+  })
+
+  it('has no preview on JavaScript exercises', async () => {
+    await openExercise()
+    expect(screen.queryByTitle('Preview of your page')).not.toBeInTheDocument()
   })
 })

@@ -2,6 +2,7 @@ import { LessonContent } from '../lessons/LessonContent'
 import styles from './exercises.module.css'
 
 interface SolutionRevealProps {
+  language: 'js' | 'html'
   solution: string
   explanation: string
   revealed: boolean
@@ -10,6 +11,7 @@ interface SolutionRevealProps {
 }
 
 export function SolutionReveal({
+  language,
   solution,
   explanation,
   revealed,
@@ -31,7 +33,7 @@ export function SolutionReveal({
         // Reuses the lesson renderer, so the code looks the same as in lessons.
         <LessonContent
           blocks={[
-            { type: 'code', language: 'js', code: solution },
+            { type: 'code', language, code: solution },
             { type: 'text', text: explanation },
           ]}
         />

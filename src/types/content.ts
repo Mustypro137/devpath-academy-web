@@ -53,9 +53,11 @@ export interface Lesson {
 }
 
 // --- Exercises --------------------------------------------------------------------------------
-// A JavaScript exercise asks the learner to write one function. Each test calls it with `args`
-// and compares the return value with `expected`. HTML/CSS exercises (Milestone 5) will add a
-// second shape to the `Exercise` union.
+// Two kinds of exercise share most fields (see ExerciseBase):
+// - JavaScript: the learner writes one function. Each test calls it with `args` and compares
+//   the return value with `expected`.
+// - HTML/CSS: the learner writes a page. Each test is a DomCheck run against that page.
+// Tests are plain data (no functions), so they can be sent to a Worker or iframe with postMessage.
 
 export interface JsTestCase {
   description: string // shown in the results, e.g. "greet('Ada') returns 'Hello, Ada!'"
@@ -63,17 +65,40 @@ export interface JsTestCase {
   expected: unknown // what it should return
 }
 
-export interface JsExercise {
+interface ExerciseBase {
   id: string // used in the URL: /exercises/<id>
-  language: 'js'
   title: string
   instructions: string[] // paragraphs; `backticks` become inline code
-  functionName: string // the function the tests call
   starterCode: string
-  tests: JsTestCase[]
   hints: string[] // shown one at a time, in order
   solution: string
   explanation: string // why the solution works, shown with it
 }
 
-export type Exercise = JsExercise
+export interface JsExercise extends ExerciseBase {
+  language: 'js'
+  functionName: string // the function the tests call
+  tests: JsTestCase[]
+}
+
+// One thing to check on the learner's page. `selector` is a CSS selector, e.g. "main h1".
+export type DomCheck =
+  | { type: 'exists'; selector: string } // at least one matching element
+  | { type: 'count'; selector: string; min: number } // at least `min` matching elements
+  | { type: 'text'; selector: string; text: string } // the first match's text equals `text`
+  // The first match has the attribute; if `value` is given, it must equal it.
+  | { type: 'attribute'; selector: string; name: string; value?: string }
+  // The first match's computed style, e.g. property "color", value "rebeccapurple".
+  | { type: 'style'; selector: string; property: string; value: string }
+
+export interface HtmlCssTestCase {
+  description: string
+  check: DomCheck
+}
+
+export interface HtmlCssExercise extends ExerciseBase {
+  language: 'html-css'
+  tests: HtmlCssTestCase[]
+}
+
+export type Exercise = JsExercise | HtmlCssExercise

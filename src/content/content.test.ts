@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { LessonBlock } from '../types/content'
 import { loadFunction, runTests } from '../features/exercises/checker'
+import { checkDocument } from '../features/exercises/domChecks'
+import type { Exercise } from '../types/content'
 import {
   EXERCISES,
   getAdjacentLessons,
@@ -64,6 +66,18 @@ describe('course content', () => {
   })
 })
 
+// Runs an exercise's tests against `code`, the same way the app does, minus the Worker/iframe.
+function check(exercise: Exercise, code: string) {
+  if (exercise.language === 'js') {
+    return runTests(loadFunction(code, exercise.functionName), exercise.tests)
+  }
+  // HTML/CSS: put the code into this test's page and check it there.
+  document.body.innerHTML = code
+  const results = checkDocument(document, exercise.tests)
+  document.body.innerHTML = ''
+  return results
+}
+
 describe('exercises', () => {
   it('gives every exercise a unique, URL-safe id', () => {
     const ids = EXERCISES.map((exercise) => exercise.id)
@@ -93,23 +107,16 @@ describe('exercises', () => {
   it.each(EXERCISES.map((exercise) => [exercise.id, exercise]))(
     '%s: the solution passes every test',
     (_id, exercise) => {
-      const results = runTests(
-        loadFunction(exercise.solution, exercise.functionName),
-        exercise.tests,
-      )
-      for (const result of results)
+      for (const result of check(exercise, exercise.solution)) {
         expect(result, result.description).toMatchObject({ passed: true })
+      }
     },
   )
 
   it.each(EXERCISES.map((exercise) => [exercise.id, exercise]))(
     '%s: the starter code does not already pass',
     (_id, exercise) => {
-      const results = runTests(
-        loadFunction(exercise.starterCode, exercise.functionName),
-        exercise.tests,
-      )
-      expect(results.every((result) => result.passed)).toBe(false)
+      expect(check(exercise, exercise.starterCode).every((result) => result.passed)).toBe(false)
     },
   )
 

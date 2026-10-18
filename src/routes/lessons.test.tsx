@@ -130,9 +130,4 @@ describe('practice exercises on a lesson', () => {
       screen.getByRole('link', { name: 'Area of a rectangle' }).parentElement,
     ).not.toHaveTextContent('(passed)')
   })
-
-  it('has no Practice section on lessons without exercises', () => {
-    renderAt('/learn/css-box-model')
-    expect(screen.queryByRole('region', { name: 'Practice' })).not.toBeInTheDocument()
-  })
 })

@@ -1,23 +1,36 @@
+import type { Exercise } from '../../types/content'
 import type { RunOutcome } from './checker'
 import { RUN_TIMEOUT_MS } from './runner'
 import styles from './exercises.module.css'
 
 // The results of the last run. The wrapper is always on the page with aria-live, so screen
 // readers announce new results when they appear (a live region must exist before it changes).
-export function TestResults({ outcome }: { outcome: RunOutcome | null }) {
+interface TestResultsProps {
+  outcome: RunOutcome | null
+  language: Exercise['language']
+}
+
+export function TestResults({ outcome, language }: TestResultsProps) {
   return (
     <div aria-live="polite" className={styles.results}>
-      {outcome && <ResultsBody outcome={outcome} />}
+      {outcome && <ResultsBody outcome={outcome} language={language} />}
     </div>
   )
 }
 
-function ResultsBody({ outcome }: { outcome: RunOutcome }) {
+function ResultsBody({
+  outcome,
+  language,
+}: {
+  outcome: RunOutcome
+  language: TestResultsProps['language']
+}) {
   if (outcome.status === 'timeout') {
     return (
       <p className={styles.problem}>
-        Your code was still running after {RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. Look
-        for a loop that never ends.
+        {language === 'js'
+          ? `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. Look for a loop that never ends.`
+          : 'Checking your page took too long, so it was stopped. Try running the tests again.'}
       </p>
     )
   }

@@ -7,7 +7,7 @@ export const cssLessons: Lesson[] = [
     title: 'How CSS works',
     summary: 'Rules, selectors, properties, and the cascade.',
     estimatedMinutes: 12,
-    exerciseIds: [],
+    exerciseIds: ['css-heading-color'],
     blocks: [
       {
         type: 'text',
@@ -71,7 +71,7 @@ export const cssLessons: Lesson[] = [
     title: 'The box model',
     summary: 'Content, padding, border, and margin — the space around every element.',
     estimatedMinutes: 10,
-    exerciseIds: [],
+    exerciseIds: ['css-card-box'],
     blocks: [
       {
         type: 'text',
