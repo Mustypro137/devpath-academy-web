@@ -36,6 +36,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         ...current,
         exercises: { ...current.exercises, [exerciseId]: change(current.exercises[exerciseId]) },
       })),
+    recordAssessmentAttempt: (attempt) =>
+      setProgress((current) => ({
+        ...current,
+        assessment: { attempts: [...current.assessment.attempts, attempt] },
+      })),
     replaceProgress: setProgress,
     resetProgress: () => setProgress(createEmptyProgress()),
   }

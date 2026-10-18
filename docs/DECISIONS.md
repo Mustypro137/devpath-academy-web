@@ -3,6 +3,33 @@
 Decisions made during implementation that refine or deviate from [`PLAN.md`](PLAN.md).
 Newest first.
 
+## 2026-10-18 — M6: Four topics, each linked to a lesson
+
+- **Context:** The plan's question model has `topic` and `level`; the course has two
+  JavaScript lessons so far.
+- **Decision:** 15 questions in four topics (values, strings, operators, functions). Each topic
+  names the lesson that teaches it, so the recommendation can link straight to it. `level` is
+  stored but not used yet: the assessment is fixed, not adaptive (adaptive is on the Later list).
+- **Recommendation rules:** below 50% overall, start at the first JavaScript lesson. Otherwise,
+  if a topic is below 70%, review the weakest topic's lesson. Otherwise, go and practise.
+- **Revisit:** Add topics and remap them when new JavaScript lessons arrive.
+
+## 2026-10-18 — M6: An attempt stores counts, not answers
+
+- **Context:** The plan says `attempts: [{ date, score, byTopic }]`.
+- **Decision:** Each attempt stores `completedAt`, `correct`, `total`, and `byTopic` counts. The
+  chosen answers are not saved, so the detailed review is only shown right after finishing.
+- **Why:** `correct` and `total` keep "12 of 15" exact (a percentage alone loses it), and the
+  dashboard only needs the score. A missing `assessment` section loads as empty, so no version
+  bump.
+
+## 2026-10-18 — M6: The dashboard shows the latest score now
+
+- **Context:** M6's acceptance says the dashboard shows the latest score; the real dashboard is
+  M9.
+- **Decision:** The placeholder dashboard gets one "Skill assessment" section: the latest score,
+  or an invitation to take the assessment. M9 will fold it into the full dashboard.
+
 ## 2026-10-18 — M5: One HTML document per exercise, with the preview below the editor
 
 - **Context:** The plan says "split editor + sandboxed iframe preview".

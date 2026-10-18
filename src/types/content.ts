@@ -102,3 +102,18 @@ export interface HtmlCssExercise extends ExerciseBase {
 }
 
 export type Exercise = JsExercise | HtmlCssExercise
+
+// --- Skill assessment -------------------------------------------------------------------------
+
+export type AssessmentTopic = 'values' | 'strings' | 'operators' | 'functions'
+
+export interface AssessmentQuestion {
+  id: string
+  topic: AssessmentTopic
+  level: 'beginner' | 'intermediate'
+  prompt: string // `backticks` become inline code
+  code?: string // an optional code snippet shown under the prompt
+  options: string[] // `backticks` become inline code
+  correctIndex: number // which option is right (0 = the first)
+  explanation: string // shown on the results screen
+}

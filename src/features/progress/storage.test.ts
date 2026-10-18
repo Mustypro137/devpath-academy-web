@@ -33,6 +33,16 @@ const completed: Progress = {
       ],
     },
   },
+  assessment: {
+    attempts: [
+      {
+        completedAt: '2026-10-18T15:00:00.000Z',
+        correct: 12,
+        total: 15,
+        byTopic: { functions: { correct: 3, total: 4 } },
+      },
+    ],
+  },
 }
 
 // `completed`, with some fields of its one exercise replaced.
@@ -54,6 +64,7 @@ describe('migrate (validation)', () => {
     expect(migrate({ version: 1, lessons: completed.lessons })).toEqual({
       ...completed,
       exercises: {},
+      assessment: { attempts: [] },
     })
   })
 
@@ -73,6 +84,11 @@ describe('migrate (validation)', () => {
     ['an exercise with an unknown status', withExercise({ status: 'done' })],
     ['an exercise without lastCode', withExercise({ lastCode: undefined })],
     ['a submission with an unknown outcome', withExercise({ submissions: [{ outcome: 'meh' }] })],
+    ['assessment without attempts', { version: 1, assessment: {} }],
+    [
+      'an attempt without byTopic',
+      { version: 1, assessment: { attempts: [{ completedAt: 'x', correct: 1, total: 2 }] } },
+    ],
   ])('rejects %s', (_label, value) => {
     expect(migrate(value)).toBeNull()
   })

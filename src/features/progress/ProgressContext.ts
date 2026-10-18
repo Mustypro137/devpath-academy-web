@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { ExerciseProgress, Progress } from '../../types/progress'
+import type { AssessmentAttempt, ExerciseProgress, Progress } from '../../types/progress'
 
 // Everything a component can read or do with progress.
 export interface ProgressContextValue {
@@ -13,6 +13,7 @@ export interface ProgressContextValue {
     exerciseId: string,
     change: (current: ExerciseProgress | undefined) => ExerciseProgress,
   ) => void
+  recordAssessmentAttempt: (attempt: AssessmentAttempt) => void
   replaceProgress: (progress: Progress) => void // used by import
   resetProgress: () => void
 }

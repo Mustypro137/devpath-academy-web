@@ -9,6 +9,7 @@ import { jsLessons } from './lessons/js'
 import { MODULES } from './modules'
 
 export { MODULES }
+export { ASSESSMENT_QUESTIONS, ASSESSMENT_TOPICS } from './assessment'
 
 // All lessons in course order: module by module, lessons in file order.
 export const LESSONS: readonly Lesson[] = [...htmlLessons, ...cssLessons, ...jsLessons]

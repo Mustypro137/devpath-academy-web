@@ -2,10 +2,12 @@
 // If progress moves to a server later, only this file needs to change.
 import {
   PROGRESS_VERSION,
+  type AssessmentAttempt,
   type ExerciseProgress,
   type LessonProgress,
   type Progress,
   type Submission,
+  type TopicScore,
 } from '../../types/progress'
 
 export const PROGRESS_STORAGE_KEY = 'devpath-progress'
@@ -16,7 +18,7 @@ export const CORRUPT_BACKUP_KEY = 'devpath-progress-corrupt'
 export const MAX_SUBMISSIONS = 10
 
 export function createEmptyProgress(): Progress {
-  return { version: PROGRESS_VERSION, lessons: {}, exercises: {} }
+  return { version: PROGRESS_VERSION, lessons: {}, exercises: {}, assessment: { attempts: [] } }
 }
 
 // --- Validation -------------------------------------------------------------------------------
@@ -60,6 +62,27 @@ function isExerciseProgress(value: unknown): value is ExerciseProgress {
 
 // Checks one section: a record whose every value passes `isItem`.
 // A missing section is treated as empty, so data saved before the section existed still loads.
+function isTopicScore(value: unknown): value is TopicScore {
+  return isRecord(value) && typeof value.correct === 'number' && typeof value.total === 'number'
+}
+
+function isAssessmentAttempt(value: unknown): value is AssessmentAttempt {
+  return (
+    isRecord(value) &&
+    typeof value.completedAt === 'string' &&
+    isTopicScore(value) && // an attempt has `correct` and `total` too
+    isRecord(value.byTopic) &&
+    Object.values(value.byTopic).every(isTopicScore)
+  )
+}
+
+// The assessment section is `{ attempts: [...] }` rather than a record keyed by id.
+function parseAssessment(value: unknown): Progress['assessment'] | null {
+  if (value === undefined) return { attempts: [] } // saved before Milestone 6
+  if (!isRecord(value) || !Array.isArray(value.attempts)) return null
+  return value.attempts.every(isAssessmentAttempt) ? { attempts: value.attempts } : null
+}
+
 function parseSection<T>(
   value: unknown,
   isItem: (item: unknown) => item is T,
@@ -78,10 +101,11 @@ export function migrate(data: unknown): Progress | null {
 
   const lessons = parseSection(data.lessons, isLessonProgress)
   const exercises = parseSection(data.exercises, isExerciseProgress)
-  if (!lessons || !exercises) return null
+  const assessment = parseAssessment(data.assessment)
+  if (!lessons || !exercises || !assessment) return null
 
   // Build a fresh object rather than returning `data`, so unknown extra fields are dropped.
-  return { version: PROGRESS_VERSION, lessons, exercises }
+  return { version: PROGRESS_VERSION, lessons, exercises, assessment }
 }
 
 // --- localStorage -----------------------------------------------------------------------------
