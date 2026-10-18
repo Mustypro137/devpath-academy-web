@@ -6,6 +6,7 @@ import {
   type ExerciseProgress,
   type LessonProgress,
   type Progress,
+  type ProjectProgress,
   type Submission,
   type TopicScore,
 } from '../../types/progress'
@@ -18,7 +19,13 @@ export const CORRUPT_BACKUP_KEY = 'devpath-progress-corrupt'
 export const MAX_SUBMISSIONS = 10
 
 export function createEmptyProgress(): Progress {
-  return { version: PROGRESS_VERSION, lessons: {}, exercises: {}, assessment: { attempts: [] } }
+  return {
+    version: PROGRESS_VERSION,
+    lessons: {},
+    exercises: {},
+    assessment: { attempts: [] },
+    project: { tasks: {}, repoUrl: '' },
+  }
 }
 
 // --- Validation -------------------------------------------------------------------------------
@@ -83,6 +90,19 @@ function parseAssessment(value: unknown): Progress['assessment'] | null {
   return value.attempts.every(isAssessmentAttempt) ? { attempts: value.attempts } : null
 }
 
+function isBoolean(value: unknown): value is boolean {
+  return typeof value === 'boolean'
+}
+
+function parseProject(value: unknown): ProjectProgress | null {
+  if (value === undefined) return { tasks: {}, repoUrl: '' } // saved before Milestone 7
+  if (!isRecord(value)) return null
+  const tasks = parseSection(value.tasks, isBoolean)
+  const repoUrl = value.repoUrl ?? ''
+  if (!tasks || typeof repoUrl !== 'string') return null
+  return { tasks, repoUrl }
+}
+
 function parseSection<T>(
   value: unknown,
   isItem: (item: unknown) => item is T,
@@ -102,10 +122,11 @@ export function migrate(data: unknown): Progress | null {
   const lessons = parseSection(data.lessons, isLessonProgress)
   const exercises = parseSection(data.exercises, isExerciseProgress)
   const assessment = parseAssessment(data.assessment)
-  if (!lessons || !exercises || !assessment) return null
+  const project = parseProject(data.project)
+  if (!lessons || !exercises || !assessment || !project) return null
 
   // Build a fresh object rather than returning `data`, so unknown extra fields are dropped.
-  return { version: PROGRESS_VERSION, lessons, exercises, assessment }
+  return { version: PROGRESS_VERSION, lessons, exercises, assessment, project }
 }
 
 // --- localStorage -----------------------------------------------------------------------------

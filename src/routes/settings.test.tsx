@@ -9,6 +9,7 @@ const SAVED: Progress = {
   lessons: { 'html-what-is-html': { completedAt: '2026-10-18T12:00:00.000Z' } },
   exercises: {},
   assessment: { attempts: [] },
+  project: { tasks: {}, repoUrl: '' },
 }
 
 // Starts the app with progress already saved, like a returning learner.

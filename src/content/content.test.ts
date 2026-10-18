@@ -14,6 +14,7 @@ import {
   getLessonsForModule,
   LESSONS,
   MODULES,
+  PROJECT,
 } from '.'
 
 // These tests check the content itself, so mistakes in lesson data fail the build
@@ -173,6 +174,41 @@ describe('assessment questions', () => {
         const backticks = text.split('`').length - 1
         expect(backticks % 2, `Unbalanced backtick in "${question.id}": ${text}`).toBe(0)
       }
+    }
+  })
+})
+
+describe('project', () => {
+  const tasks = PROJECT.milestones.flatMap((milestone) => milestone.tasks)
+
+  it('has 5–6 milestones, each with tasks, a goal, and hints', () => {
+    expect(PROJECT.milestones.length).toBeGreaterThanOrEqual(5)
+    expect(PROJECT.milestones.length).toBeLessThanOrEqual(6)
+    for (const milestone of PROJECT.milestones) {
+      expect(milestone.tasks.length, milestone.id).toBeGreaterThan(0)
+      expect(milestone.goal, milestone.id).not.toBe('')
+      expect(milestone.hints.length, milestone.id).toBeGreaterThan(0)
+    }
+  })
+
+  // Saved progress refers to tasks by id, so ids must be unique and must never be reused.
+  it('gives every task and milestone a unique, URL-safe id', () => {
+    const ids = [
+      ...PROJECT.milestones.map((milestone) => milestone.id),
+      ...tasks.map((task) => task.id),
+    ]
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const id of ids) expect(id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/)
+  })
+
+  it('closes every `inline code` backtick', () => {
+    const texts = [
+      ...PROJECT.brief,
+      ...tasks.map((task) => task.text),
+      ...PROJECT.milestones.flatMap((milestone) => [milestone.goal, ...milestone.hints]),
+    ]
+    for (const text of texts) {
+      expect((text.split('`').length - 1) % 2, `Unbalanced backtick: ${text}`).toBe(0)
     }
   })
 })

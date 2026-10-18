@@ -3,6 +3,22 @@
 Decisions made during implementation that refine or deviate from [`PLAN.md`](PLAN.md).
 Newest first.
 
+## 2026-10-18 — M7: Project tasks have ids; the repository link is saved in progress
+
+- **Context:** The plan's model has `tasks: string[]` and `project: { [taskId]: boolean }`, but
+  plain strings have no id to save ticks under. "Link to own repo" had no place in the model.
+- **Decision:** Each task is `{ id, text }`. Saved progress is
+  `project: { tasks: { [taskId]: boolean }, repoUrl: string }`. A missing `project` section
+  loads as empty, so no version bump.
+- **Consequence:** Task ids must never change once released, or learners lose those ticks.
+  `content.test.ts` checks they are unique.
+
+## 2026-10-18 — M7: Only http(s) repository links are accepted
+
+- **Decision:** The link must parse with `new URL()` and use `http:` or `https:`. Any host is
+  allowed (GitHub, GitLab, Codeberg...).
+- **Why:** A saved `javascript:` link would run code when clicked; a scheme check stops that.
+
 ## 2026-10-18 — M6: Four topics, each linked to a lesson
 
 - **Context:** The plan's question model has `topic` and `level`; the course has two

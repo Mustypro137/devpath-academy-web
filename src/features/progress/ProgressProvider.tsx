@@ -41,6 +41,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         ...current,
         assessment: { attempts: [...current.assessment.attempts, attempt] },
       })),
+    setProjectTask: (taskId, done) =>
+      setProgress((current) => ({
+        ...current,
+        project: { ...current.project, tasks: { ...current.project.tasks, [taskId]: done } },
+      })),
+    setProjectRepoUrl: (repoUrl) =>
+      setProgress((current) => ({ ...current, project: { ...current.project, repoUrl } })),
     replaceProgress: setProgress,
     resetProgress: () => setProgress(createEmptyProgress()),
   }
