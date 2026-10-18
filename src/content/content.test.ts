@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { LessonBlock } from '../types/content'
 import { loadFunction, runTests } from '../features/exercises/checker'
 import { checkDocument } from '../features/exercises/domChecks'
+import { countWords } from '../features/career/wordCount'
 import type { Exercise } from '../types/content'
 import {
   ASSESSMENT_QUESTIONS,
@@ -13,8 +14,11 @@ import {
   getLessonForExercise,
   getLessonsForModule,
   LESSONS,
+  getWritingPrompt,
   MODULES,
   PROJECT,
+  WRITING_CATEGORIES,
+  WRITING_PROMPTS,
 } from '.'
 
 // These tests check the content itself, so mistakes in lesson data fail the build
@@ -213,6 +217,49 @@ describe('project', () => {
   })
 })
 
+describe('writing prompts', () => {
+  it('has around six prompts with unique, URL-safe ids', () => {
+    expect(WRITING_PROMPTS.length).toBeGreaterThanOrEqual(5)
+    const ids = WRITING_PROMPTS.map((prompt) => prompt.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const id of ids) expect(id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/)
+  })
+
+  it('gives every category at least one prompt', () => {
+    for (const category of Object.keys(WRITING_CATEGORIES)) {
+      expect(
+        WRITING_PROMPTS.some((prompt) => prompt.category === category),
+        category,
+      ).toBe(true)
+    }
+  })
+
+  it('gives every prompt a scenario, tips, a checklist, and a sensible word range', () => {
+    for (const prompt of WRITING_PROMPTS) {
+      expect(prompt.scenario.length, prompt.id).toBeGreaterThan(0)
+      expect(prompt.tips.length, prompt.id).toBeGreaterThan(0)
+      expect(prompt.checklist.length, prompt.id).toBeGreaterThan(0)
+      expect(prompt.targetWords.min, prompt.id).toBeLessThan(prompt.targetWords.max)
+    }
+  })
+
+  // A good example should follow the advice it comes with.
+  it('keeps every example within its own word range', () => {
+    for (const prompt of WRITING_PROMPTS) {
+      if (!prompt.example) continue
+      const words = countWords(prompt.example)
+      expect(words, prompt.id).toBeGreaterThanOrEqual(prompt.targetWords.min)
+      expect(words, prompt.id).toBeLessThanOrEqual(prompt.targetWords.max)
+    }
+  })
+
+  it('closes every `inline code` backtick in scenarios', () => {
+    for (const text of WRITING_PROMPTS.flatMap((prompt) => prompt.scenario)) {
+      expect((text.split('`').length - 1) % 2, `Unbalanced backtick: ${text}`).toBe(0)
+    }
+  })
+})
+
 describe('content helpers', () => {
   it('finds a lesson by id, and returns undefined for unknown ids', () => {
     expect(getLesson('css-box-model')?.title).toBe('The box model')
@@ -230,6 +277,11 @@ describe('content helpers', () => {
     // The last HTML lesson leads into the first CSS lesson.
     const lastHtml = getLessonsForModule('html').at(-1)!
     expect(getAdjacentLessons(lastHtml.id).next).toBe(getLessonsForModule('css')[0])
+  })
+
+  it('finds a writing prompt by id', () => {
+    expect(getWritingPrompt('readme')?.title).toBe('A README for your project')
+    expect(getWritingPrompt('nope')).toBeUndefined()
   })
 
   it('finds the lesson an exercise belongs to', () => {
