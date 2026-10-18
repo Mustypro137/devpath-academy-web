@@ -42,9 +42,15 @@ export interface AssessmentAttempt {
   byTopic: Record<string, TopicScore> // keyed by topic, e.g. "functions"
 }
 
+export interface ProjectProgress {
+  tasks: Record<string, boolean> // keyed by task id; true = done
+  repoUrl: string // the learner's own repository, '' until they add it
+}
+
 export interface Progress {
   version: typeof PROGRESS_VERSION
   lessons: Record<string, LessonProgress> // keyed by lesson id
   exercises: Record<string, ExerciseProgress> // keyed by exercise id
   assessment: { attempts: AssessmentAttempt[] } // oldest first
+  project: ProjectProgress
 }

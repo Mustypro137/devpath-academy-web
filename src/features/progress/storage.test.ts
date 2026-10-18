@@ -43,6 +43,10 @@ const completed: Progress = {
       },
     ],
   },
+  project: {
+    tasks: { 'setup-git': true, 'setup-folder': false },
+    repoUrl: 'https://github.com/me/tt',
+  },
 }
 
 // `completed`, with some fields of its one exercise replaced.
@@ -65,6 +69,7 @@ describe('migrate (validation)', () => {
       ...completed,
       exercises: {},
       assessment: { attempts: [] },
+      project: { tasks: {}, repoUrl: '' },
     })
   })
 
@@ -85,6 +90,8 @@ describe('migrate (validation)', () => {
     ['an exercise without lastCode', withExercise({ lastCode: undefined })],
     ['a submission with an unknown outcome', withExercise({ submissions: [{ outcome: 'meh' }] })],
     ['assessment without attempts', { version: 1, assessment: {} }],
+    ['a project task that is not true/false', { version: 1, project: { tasks: { a: 'yes' } } }],
+    ['a project repoUrl that is not text', { version: 1, project: { tasks: {}, repoUrl: 5 } }],
     [
       'an attempt without byTopic',
       { version: 1, assessment: { attempts: [{ completedAt: 'x', correct: 1, total: 2 }] } },

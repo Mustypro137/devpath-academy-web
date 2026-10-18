@@ -14,6 +14,8 @@ export interface ProgressContextValue {
     change: (current: ExerciseProgress | undefined) => ExerciseProgress,
   ) => void
   recordAssessmentAttempt: (attempt: AssessmentAttempt) => void
+  setProjectTask: (taskId: string, done: boolean) => void
+  setProjectRepoUrl: (url: string) => void
   replaceProgress: (progress: Progress) => void // used by import
   resetProgress: () => void
 }
