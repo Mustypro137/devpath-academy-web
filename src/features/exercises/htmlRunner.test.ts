@@ -75,6 +75,24 @@ describe('runHtmlChecks', () => {
   })
 })
 
+describe('the real checker iframe', () => {
+  it('is sandboxed with scripts only, hidden, and removed when finished', async () => {
+    vi.useFakeTimers()
+    const promise = runHtmlChecks('<h1>Hi</h1>', tests) // no fake frame this time
+
+    const iframe = document.querySelector('iframe')!
+    // Only allow-scripts: no allow-same-origin, so it can't read this page or its storage.
+    expect(iframe.getAttribute('sandbox')).toBe('allow-scripts')
+    expect(iframe).toHaveAttribute('aria-hidden', 'true')
+    expect(iframe.getAttribute('srcdoc')).toContain('Content-Security-Policy')
+
+    // jsdom doesn't run the iframe's script, so this run ends in a timeout.
+    vi.advanceTimersByTime(CHECK_TIMEOUT_MS)
+    expect(await promise).toEqual({ status: 'timeout' })
+    expect(document.querySelector('iframe')).toBeNull()
+  })
+})
+
 describe('buildCheckerDocument', () => {
   const html = buildCheckerDocument('<h1>Mine</h1><script>while (true) {}</script>', 'abc123')
 

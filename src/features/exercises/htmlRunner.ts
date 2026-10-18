@@ -55,7 +55,7 @@ function createCheckerFrame(srcdoc: string): CheckerFrame {
   const iframe = document.createElement('iframe')
   // allow-scripts lets our checker run. Without allow-same-origin the iframe counts as a
   // different website: it can't read this page, its cookies, or localStorage.
-  iframe.sandbox.add('allow-scripts')
+  iframe.setAttribute('sandbox', 'allow-scripts')
   iframe.srcdoc = srcdoc
   iframe.title = 'Exercise checker'
   iframe.setAttribute('aria-hidden', 'true')
