@@ -3,6 +3,18 @@
 // calls these; nothing on the main page ever runs learner code.
 import type { JsTestCase } from '../../types/content'
 
+// What the page sends to the Worker, and what comes back.
+export interface RunRequest {
+  code: string
+  functionName: string
+  tests: JsTestCase[]
+}
+
+export type RunOutcome =
+  | { status: 'done'; results: TestResult[] } // the code ran; some tests may have failed
+  | { status: 'error'; message: string } // the code couldn't run (syntax error, missing function)
+  | { status: 'timeout' } // still running after the time limit, e.g. an infinite loop
+
 export interface TestResult {
   description: string
   passed: boolean
@@ -81,4 +93,13 @@ export function runTests(fn: (...args: unknown[]) => unknown, tests: JsTestCase[
       return { description: test.description, passed: false, expected, error: errorMessage(error) }
     }
   })
+}
+
+// Everything the Worker does, as one pure function.
+export function checkCode({ code, functionName, tests }: RunRequest): RunOutcome {
+  try {
+    return { status: 'done', results: runTests(loadFunction(code, functionName), tests) }
+  } catch (error) {
+    return { status: 'error', message: errorMessage(error) }
+  }
 }
