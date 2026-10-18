@@ -3,6 +3,55 @@
 Decisions made during implementation that refine or deviate from [`PLAN.md`](PLAN.md).
 Newest first.
 
+## 2026-10-18 — M4: Exercise tests are `{ args, expected }` for one named function
+
+- **Context:** The plan's `TestCase` is `{ description, check }`.
+- **Decision:** A JS exercise names one function (`functionName`). Each test is
+  `{ description, args, expected }`, compared with a deep-equality check.
+- **Why:** Tests stay plain data (no functions), so they can be sent to the Worker with
+  `postMessage`. Failures can show "expected X, got Y", and every solution is checked
+  automatically in `content.test.ts`.
+- **Revisit:** Exercises that need console output or several functions would need a richer test
+  shape.
+
+## 2026-10-18 — M4: Submission history is saved in progress
+
+- **Context:** The plan's `exercises` entry has `lastCode` but no history, while M4 asks for
+  submission history.
+- **Decision:** Each entry also stores `submissions`: the newest 10 runs, with code, outcome, and
+  pass count. The `exercises` section was added without a version bump, because a missing
+  section loads as empty.
+- **Consequence:** Exported files include the history. The cap keeps them small.
+
+## 2026-10-18 — M4: The solution unlocks after the last hint
+
+- **Context:** The plan's "Stuck" journey: exhaust hints, then confirm, then reveal the solution.
+- **Decision:** "Show solution" appears only once every hint is shown, and still asks for
+  confirmation. Passing after viewing it shows "Solved with the solution".
+
+## 2026-10-18 — M4: Editor code is saved on every change, without debouncing
+
+- **Decision:** Each edit updates progress, which saves the whole progress object to
+  `localStorage`.
+- **Why:** Simple, and the code survives a refresh immediately. Progress is small, so this is
+  fast enough.
+- **Revisit:** Debounce saving in M5 (the plan teaches debouncing there) or if typing feels slow.
+
+## 2026-10-18 — M4: The exercise page is lazy-loaded
+
+- **Context:** CodeMirror grew the main bundle from ~90 kB to ~263 kB gzipped.
+- **Decision:** `React.lazy` loads the exercise page in its own chunk (~171 kB gzipped).
+- **Consequence:** Vite warns that this chunk is over 500 kB before gzip. That is CodeMirror's
+  real size, so the warning is left visible rather than silenced.
+
+## 2026-10-18 — M4: Page tests don't run a real Worker
+
+- **Context:** jsdom has no Web Workers.
+- **Decision:** `runner.test.ts` tests the timeout logic with a fake worker. Page tests replace
+  `runCode` with `checkCode`. The real Worker was checked by hand in Chrome: an infinite loop is
+  stopped after ~3 s and the page stays responsive.
+- **Revisit:** Cover it with a Playwright E2E test in M10.
+
 ## 2026-10-18 — M3: Lesson completion is a checkbox; export is a `data:` link
 
 - **Context:** The plan says "Mark complete".
