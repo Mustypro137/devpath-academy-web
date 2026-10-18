@@ -1,49 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { EXERCISES, getExercisesForLesson, LESSONS, PROJECT, WRITING_PROMPTS } from '../../content'
-import type { Progress } from '../../types/progress'
+import { EXERCISES, getExercisesForLesson, LESSONS, WRITING_PROMPTS } from '../../content'
+import { DATE, finished, withLessons, withPassed } from '../../test/progressFixtures'
 import { startExercise } from '../exercises/exerciseProgress'
 import { createEmptyProgress } from '../progress/storage'
 import { describePlace, nextStep, summarizeDashboard } from './dashboard'
-
-const DATE = '2026-10-18T12:00:00.000Z'
-
-// --- Building progress for each kind of learner ---
-
-function withLessons(progress: Progress, lessonIds: string[]): Progress {
-  const lessons = { ...progress.lessons }
-  for (const id of lessonIds) lessons[id] = { completedAt: DATE }
-  return { ...progress, lessons }
-}
-
-function withPassed(progress: Progress, exerciseIds: string[]): Progress {
-  const exercises = { ...progress.exercises }
-  for (const id of exerciseIds) {
-    const exercise = EXERCISES.find((ex) => ex.id === id)!
-    exercises[id] = { ...startExercise(exercise), status: 'passed', attempts: 1, solvedAt: DATE }
-  }
-  return { ...progress, exercises }
-}
-
-// Every lesson read, every exercise passed, every project task and writing prompt done.
-function finished(): Progress {
-  let progress = withLessons(
-    createEmptyProgress(),
-    LESSONS.map((lesson) => lesson.id),
-  )
-  progress = withPassed(
-    progress,
-    EXERCISES.map((exercise) => exercise.id),
-  )
-  const tasks = PROJECT.milestones.flatMap((m) => m.tasks).map((task) => [task.id, true])
-  progress.project = { tasks: Object.fromEntries(tasks), repoUrl: '' }
-  progress.writing = Object.fromEntries(
-    WRITING_PROMPTS.map((prompt) => [
-      prompt.id,
-      { draft: 'Done.', checklist: prompt.checklist.map(() => true), updatedAt: DATE },
-    ]),
-  )
-  return progress
-}
 
 const [firstLesson, secondLesson] = LESSONS
 const firstExercise = getExercisesForLesson(firstLesson)[0]
