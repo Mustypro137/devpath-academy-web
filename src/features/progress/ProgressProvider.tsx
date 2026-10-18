@@ -60,6 +60,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         ...current,
         writing: { ...current.writing, [promptId]: change(current.writing[promptId]) },
       })),
+    recordVisit: (path) => {
+      // Skip the save when nothing changes (e.g. returning to the same page).
+      if (latest.current.lastVisited !== path) {
+        commit((current) => ({ ...current, lastVisited: path }))
+      }
+    },
     replaceProgress: (imported) => commit(() => imported),
     resetProgress: () => commit(createEmptyProgress),
   }

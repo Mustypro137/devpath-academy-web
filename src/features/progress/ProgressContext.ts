@@ -26,6 +26,7 @@ export interface ProgressContextValue {
     promptId: string,
     change: (current: WritingProgress | undefined) => WritingProgress,
   ) => void
+  recordVisit: (path: string) => void // see useTrackLastVisited
   replaceProgress: (progress: Progress) => void // used by import
   resetProgress: () => void
 }

@@ -60,4 +60,7 @@ export interface Progress {
   assessment: { attempts: AssessmentAttempt[] } // oldest first
   project: ProjectProgress
   writing: Record<string, WritingProgress> // keyed by writing prompt id
+  // The address of the last lesson, exercise, writing prompt, or project page opened, e.g.
+  // "/learn/js-functions"; '' before any. The dashboard looks up its title from the content.
+  lastVisited: string
 }
