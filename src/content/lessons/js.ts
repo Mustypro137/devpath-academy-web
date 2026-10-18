@@ -7,7 +7,7 @@ export const jsLessons: Lesson[] = [
     title: 'Values and variables',
     summary: 'Storing data with const and let, and the basic types of value.',
     estimatedMinutes: 12,
-    exerciseIds: [],
+    exerciseIds: ['js-greet', 'js-full-name', 'js-add-number-strings'],
     blocks: [
       {
         type: 'text',
@@ -62,7 +62,7 @@ export const jsLessons: Lesson[] = [
     title: 'Functions',
     summary: 'Packaging code you can reuse: parameters, return values, and arrow functions.',
     estimatedMinutes: 15,
-    exerciseIds: [],
+    exerciseIds: ['js-double', 'js-rectangle-area', 'js-celsius-to-fahrenheit', 'js-is-even'],
     blocks: [
       {
         type: 'text',

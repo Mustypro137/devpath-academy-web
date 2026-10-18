@@ -49,7 +49,7 @@ export interface Lesson {
   summary: string
   estimatedMinutes: number
   blocks: LessonBlock[]
-  exerciseIds: string[] // filled in from Milestone 4
+  exerciseIds: string[] // exercises to practise with after reading, in order
 }
 
 // --- Exercises --------------------------------------------------------------------------------
