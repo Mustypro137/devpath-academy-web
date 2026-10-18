@@ -1,11 +1,18 @@
 import { createContext } from 'react'
-import type { Progress } from '../../types/progress'
+import type { ExerciseProgress, Progress } from '../../types/progress'
 
 // Everything a component can read or do with progress.
 export interface ProgressContextValue {
   progress: Progress
   isLessonComplete: (lessonId: string) => boolean
   setLessonComplete: (lessonId: string, complete: boolean) => void
+  getExerciseProgress: (exerciseId: string) => ExerciseProgress | undefined
+  // `change` gets the current entry (undefined if the exercise was never opened) and returns
+  // the new one. The rules for what changes live in features/exercises/exerciseProgress.ts.
+  updateExercise: (
+    exerciseId: string,
+    change: (current: ExerciseProgress | undefined) => ExerciseProgress,
+  ) => void
   replaceProgress: (progress: Progress) => void // used by import
   resetProgress: () => void
 }
