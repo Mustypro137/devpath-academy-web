@@ -3,6 +3,36 @@
 Decisions made during implementation that refine or deviate from [`PLAN.md`](PLAN.md).
 Newest first.
 
+## 2026-10-18 — M5: One HTML document per exercise, with the preview below the editor
+
+- **Context:** The plan says "split editor + sandboxed iframe preview".
+- **Decision:** One editor holds a whole HTML document, with CSS in a `<style>` element. The
+  preview sits below the editor and its results, not beside it.
+- **Why:** One string keeps saved progress the same shape as for JavaScript (no migration). A
+  `<style>` element is real HTML that beginners meet anyway. The content column (48rem) is too
+  narrow for an editor and a preview side by side.
+- **Revisit:** Separate HTML and CSS tabs, or a wider side-by-side layout, if exercises grow.
+
+## 2026-10-18 — M5: HTML/CSS checks run in a throwaway hidden iframe
+
+- **Decision:** Checks are plain `DomCheck` data. For each run, a hidden iframe is created with
+  `sandbox="allow-scripts"` (no `allow-same-origin`) and a Content-Security-Policy that only
+  lets our nonce-tagged checker script run. Results come back by `postMessage`, are accepted
+  only from that iframe, and time out after 3 s. The visible preview is a separate iframe with
+  `sandbox=""`.
+- **Why:** The same shape as the JavaScript Worker: a fresh, isolated environment per run. The
+  learner's scripts never run, so they can't freeze the page or fake results.
+- **Consequence:** `checkDocument` must stay self-contained, because it is copied into the iframe
+  as text. A unit test guards this.
+
+## 2026-10-18 — M5: Saving editor code is still not debounced
+
+- **Context:** M4 left "debounce saving" to revisit in M5.
+- **Decision:** Keep saving on every change. Only the preview is debounced.
+- **Why:** Saving is fast for progress this small. A debounced save can lose the last
+  keystrokes if the tab closes during the delay, and would need extra code to flush on exit.
+- **Revisit:** If typing feels slow, or progress gets much bigger.
+
 ## 2026-10-18 — M4: Exercise tests are `{ args, expected }` for one named function
 
 - **Context:** The plan's `TestCase` is `{ description, check }`.
