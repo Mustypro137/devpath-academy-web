@@ -1,12 +1,14 @@
 import { Link, useParams } from 'react-router'
 import { getAdjacentLessons, getLesson, getModule } from '../content'
 import { LessonContent } from '../features/lessons/LessonContent'
+import { useProgress } from '../features/progress/useProgress'
 import styles from './LessonPage.module.css'
 
 export function LessonPage() {
   // useParams reads the :lessonId part of the URL, e.g. /learn/css-box-model → "css-box-model".
   const { lessonId } = useParams()
   const lesson = getLesson(lessonId)
+  const { isLessonComplete, setLessonComplete } = useProgress()
 
   // A URL can contain anything, so handle lessons that don't exist.
   if (!lesson) {
@@ -33,6 +35,16 @@ export function LessonPage() {
       <p className={styles.meta}>{lesson.estimatedMinutes} min read</p>
 
       <LessonContent blocks={lesson.blocks} />
+
+      {/* A checkbox (not a button) because it is an on/off state, and screen readers say so. */}
+      <label className={styles.complete}>
+        <input
+          type="checkbox"
+          checked={isLessonComplete(lesson.id)}
+          onChange={(event) => setLessonComplete(lesson.id, event.target.checked)}
+        />
+        I've completed this lesson
+      </label>
 
       <nav aria-label="Lesson" className={styles.pager}>
         {previous && (

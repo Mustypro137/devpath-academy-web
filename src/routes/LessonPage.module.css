@@ -10,6 +10,26 @@
   font-size: var(--text-sm);
 }
 
+/* Big click target: the whole box toggles the checkbox, because the input is inside the label. */
+.complete {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.complete input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--color-accent);
+}
+
 /* Previous / next links. Wrap onto two lines on narrow screens. */
 .pager {
   display: flex;

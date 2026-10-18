@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { getLessonsForModule, LESSONS, MODULES } from '../content'
+import { PROGRESS_STORAGE_KEY } from '../features/progress/storage'
 import { renderAt } from '../test/renderAt'
 
 describe('course map (/learn)', () => {
@@ -54,5 +55,50 @@ describe('lesson reader (/learn/:lessonId)', () => {
     renderAt(`/learn/${LESSONS[LESSONS.length - 1].id}`)
     const pager = screen.getByRole('navigation', { name: 'Lesson' })
     expect(within(pager).queryByText('Next')).not.toBeInTheDocument()
+  })
+})
+
+describe('lesson completion', () => {
+  const lesson = LESSONS[0]
+  const checkboxName = "I've completed this lesson"
+
+  it('marks a lesson complete, and the course map shows a checkmark', async () => {
+    const { user } = renderAt(`/learn/${lesson.id}`)
+    const checkbox = screen.getByRole('checkbox', { name: checkboxName })
+    expect(checkbox).not.toBeChecked()
+
+    await user.click(checkbox)
+    expect(checkbox).toBeChecked()
+
+    // The sidebar and the breadcrumb both have a "Learn" link to /learn; either will do.
+    await user.click(screen.getAllByRole('link', { name: 'Learn' })[0])
+    expect(
+      screen.getByRole('link', { name: (name) => name.startsWith(`${lesson.title} (completed)`) }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/1 of \d+ complete/)).toBeInTheDocument()
+  })
+
+  it('can be unmarked', async () => {
+    const { user } = renderAt(`/learn/${lesson.id}`)
+    const checkbox = screen.getByRole('checkbox', { name: checkboxName })
+    await user.click(checkbox)
+    await user.click(checkbox)
+    expect(checkbox).not.toBeChecked()
+  })
+
+  it('survives a reload', async () => {
+    const { user, unmount } = renderAt(`/learn/${lesson.id}`)
+    await user.click(screen.getByRole('checkbox', { name: checkboxName }))
+
+    // Unmounting throws away all React state; only localStorage is left, like a page refresh.
+    unmount()
+    renderAt(`/learn/${lesson.id}`)
+    expect(screen.getByRole('checkbox', { name: checkboxName })).toBeChecked()
+  })
+
+  it('starts fresh instead of crashing when saved data is corrupted', () => {
+    localStorage.setItem(PROGRESS_STORAGE_KEY, '{not valid json')
+    renderAt(`/learn/${lesson.id}`)
+    expect(screen.getByRole('checkbox', { name: checkboxName })).not.toBeChecked()
   })
 })
