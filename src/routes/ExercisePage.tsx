@@ -10,6 +10,8 @@ import {
   toSubmission,
 } from '../features/exercises/exerciseProgress'
 import { HintPanel } from '../features/exercises/HintPanel'
+import { runHtmlChecks } from '../features/exercises/htmlRunner'
+import { HtmlPreview } from '../features/exercises/HtmlPreview'
 import { runCode } from '../features/exercises/runner'
 import { SolutionReveal } from '../features/exercises/SolutionReveal'
 import { SubmissionHistory } from '../features/exercises/SubmissionHistory'
@@ -58,6 +60,8 @@ function ExerciseWorkspace({ exercise }: { exercise: Exercise }) {
   const saved = getExerciseProgress(exercise.id)
   const entry = saved ?? startExercise(exercise)
   const lesson = getLessonForExercise(exercise.id)
+  // The editor's language: HTML/CSS exercises are one HTML document with a <style> element.
+  const editorLanguage = exercise.language === 'js' ? 'js' : 'html'
 
   // The last run's results only matter while the page is open, so they live in React state
   // rather than in saved progress. The submission history keeps a summary of each run.
@@ -78,13 +82,12 @@ function ExerciseWorkspace({ exercise }: { exercise: Exercise }) {
     if (running) return
     const code = entry.lastCode
     setRunning(true)
-    // `await` pauses this function until the Worker answers (or the timeout stops it).
-    // The rest of the page keeps working in the meantime.
-    const result = await runCode({
-      code,
-      functionName: exercise.functionName,
-      tests: exercise.tests,
-    })
+    // `await` pauses this function until the Worker or checker iframe answers (or the timeout
+    // stops it). The rest of the page keeps working in the meantime.
+    const result =
+      exercise.language === 'js'
+        ? await runCode({ code, functionName: exercise.functionName, tests: exercise.tests })
+        : await runHtmlChecks(code, exercise.tests)
     setRunning(false)
     setOutcome(result)
     update((current) => addSubmission(current, toSubmission(code, result, exercise.tests.length)))
@@ -113,7 +116,12 @@ function ExerciseWorkspace({ exercise }: { exercise: Exercise }) {
         </p>
       ))}
 
-      <CodeEditor label="Your code" value={entry.lastCode} onChange={setCode} />
+      <CodeEditor
+        label="Your code"
+        language={editorLanguage}
+        value={entry.lastCode}
+        onChange={setCode}
+      />
 
       <div className={styles.actions}>
         <button
@@ -130,7 +138,9 @@ function ExerciseWorkspace({ exercise }: { exercise: Exercise }) {
         </button>
       </div>
 
-      <TestResults outcome={outcome} />
+      <TestResults outcome={outcome} language={exercise.language} />
+
+      {exercise.language === 'html-css' && <HtmlPreview code={entry.lastCode} />}
 
       <HintPanel
         hints={exercise.hints}
@@ -139,6 +149,7 @@ function ExerciseWorkspace({ exercise }: { exercise: Exercise }) {
       />
 
       <SolutionReveal
+        language={editorLanguage}
         solution={exercise.solution}
         explanation={exercise.explanation}
         revealed={entry.solutionViewed}
