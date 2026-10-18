@@ -1,8 +1,10 @@
 import { screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { getLessonsForModule, LESSONS, MODULES } from '../content'
-import { PROGRESS_STORAGE_KEY } from '../features/progress/storage'
+import { getExercise, getLesson, getLessonsForModule, LESSONS, MODULES } from '../content'
+import { startExercise } from '../features/exercises/exerciseProgress'
+import { createEmptyProgress, PROGRESS_STORAGE_KEY } from '../features/progress/storage'
 import { renderAt } from '../test/renderAt'
+import type { Progress } from '../types/progress'
 
 describe('course map (/learn)', () => {
   it('lists every module with a link to each of its lessons', () => {
@@ -100,5 +102,37 @@ describe('lesson completion', () => {
     localStorage.setItem(PROGRESS_STORAGE_KEY, '{not valid json')
     renderAt(`/learn/${lesson.id}`)
     expect(screen.getByRole('checkbox', { name: checkboxName })).not.toBeChecked()
+  })
+})
+
+describe('practice exercises on a lesson', () => {
+  it('links to each of the lesson’s exercises', () => {
+    const lesson = getLesson('js-functions')!
+    renderAt(`/learn/${lesson.id}`)
+    const practice = screen.getByRole('region', { name: 'Practice' })
+    const links = within(practice).getAllByRole('link')
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(
+      lesson.exerciseIds.map((id) => `/exercises/${id}`),
+    )
+  })
+
+  it('marks exercises the learner has passed', () => {
+    const passed: Progress = {
+      ...createEmptyProgress(),
+      exercises: { 'js-double': { ...startExercise(getExercise('js-double')!), status: 'passed' } },
+    }
+    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(passed))
+    renderAt('/learn/js-functions')
+    expect(screen.getByRole('link', { name: 'Double it' }).parentElement).toHaveTextContent(
+      '(passed)',
+    )
+    expect(
+      screen.getByRole('link', { name: 'Area of a rectangle' }).parentElement,
+    ).not.toHaveTextContent('(passed)')
+  })
+
+  it('has no Practice section on lessons without exercises', () => {
+    renderAt('/learn/css-box-model')
+    expect(screen.queryByRole('region', { name: 'Practice' })).not.toBeInTheDocument()
   })
 })
