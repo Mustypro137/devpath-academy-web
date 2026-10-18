@@ -14,7 +14,7 @@ ESLint · Prettier
 
 ## Getting started
 
-Requires [Node.js](https://nodejs.org/) 22 or newer.
+Requires [Node.js](https://nodejs.org/) 22.22 or newer.
 
 ```bash
 npm install      # download dependencies (first time only)
